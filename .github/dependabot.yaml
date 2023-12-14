@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /
+    reviewers:
+      - sidcha
+    schedule:
+      interval: monthly
+    groups:
+      production-dependencies:
+        dependency-type: production
