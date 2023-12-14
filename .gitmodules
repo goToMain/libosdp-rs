@@ -1,3 +1,4 @@
 [submodule "vendor"]
 	path = vendor
-	url = https://github.com/goToMain/libosdp
+  url = https://github.com/goToMain/libosdp
+  branch = master
