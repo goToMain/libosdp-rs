@@ -66,13 +66,13 @@ impl GitInfo {
 fn generate_osdp_build_headers(out_dir: &str) -> Result<()> {
     // Add an empty file as we don't
     let data = "#define OSDP_EXPORT";
-    std::fs::write(path_join(&out_dir, "osdp_export.h"), data)
+    std::fs::write(path_join(out_dir, "osdp_export.h"), data)
         .context("Failed to create osdp_export.h")?;
 
     let git = GitInfo::new()?;
     let src = "vendor/src/osdp_config.h.in";
-    let dest = path_join(&out_dir, "osdp_config.h");
-    std::fs::copy(&src, &dest).context(format!("Failed: copy {src} -> {dest}"))?;
+    let dest = path_join(out_dir, "osdp_config.h");
+    std::fs::copy(src, &dest).context(format!("Failed: copy {src} -> {dest}"))?;
     configure_file(
         &dest,
         vec![
