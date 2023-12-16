@@ -1,0 +1,40 @@
+name: Build and test
+on: [push, pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setup rust 🦀
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - name: cargo fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+      - name: clippy 💅
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -D warnings
+      - name: cargo check 👷
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setup rust 🦀
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: cargo test ⚙️
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
