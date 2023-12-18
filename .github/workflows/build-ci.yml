@@ -1,12 +1,20 @@
-name: Build and test
-on: [push, pull_request]
+name: Build CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: setup rust 🦀
+        with:
+          submodules: recursive
+      - name: Setup rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -16,12 +24,12 @@ jobs:
         with:
           command: fmt
           args: --all -- --check
-      - name: clippy 💅
+      - name: Clippy
         uses: actions-rs/cargo@v1
         with:
           command: clippy
           args: -- -D warnings
-      - name: cargo check 👷
+      - name: Cargo check
         uses: actions-rs/cargo@v1
         with:
           command: check
@@ -30,11 +38,13 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: setup rust 🦀
+        with:
+          submodules: recursive
+      - name: Setup rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - name: cargo test ⚙️
+      - name: Cargo test
         uses: actions-rs/cargo@v1
         with:
           command: test
