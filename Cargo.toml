@@ -16,3 +16,8 @@ categories = ["development-tools", "embedded"]
 anyhow = "1.0.75"
 bindgen = "0.69.1"
 cc = "1.0.83"
+
+[features]
+packet_trace = []
+data_trace = []
+skip_mark_byte = []
