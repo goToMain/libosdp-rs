@@ -83,8 +83,11 @@ impl ControlPanel {
     ///     PdInfo, OsdpFlag, channel::{OsdpChannel, UnixChannel},
     ///     ControlPanel, OsdpCommand
     /// };
+    /// use std::path::PathBuf;
+    /// use std::str::FromStr;
     ///
-    /// let stream = UnixChannel::connect("conn-1").unwrap();
+    /// let path = PathBuf::from_str("/tmp/conn-0.sock").unwrap();
+    /// let stream = UnixChannel::connect(&path).unwrap();
     /// let pd_info = vec![
     ///     PdInfo::for_cp(
     ///         "PD 101", 101,

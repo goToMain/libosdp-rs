@@ -35,41 +35,86 @@
 //!
 //! #### Control Panel:
 //!
-//! A simplified (non-working) CP implementation:
+//! A simplified CP implementation:
 //!
-//! ```ignore
-//! use libosdp::{PdInfo, ControlPanel, OsdpCommand, OsdpCommandCardRead};
+//! ```rust,no_run
+//! use libosdp::{
+//!     channel::{OsdpChannel, UnixChannel}, OsdpCommand, OsdpCommandLed,
+//!     ControlPanel, OsdpError, OsdpFlag, PdInfo,
+//! };
+//! use std::{
+//!     result::Result, thread, time::Duration,
+//!     path::PathBuf, str::FromStr
+//! };
 //!
-//! let pd_info = vec! [ PdInfo::new(...), ... ];
+//! let path = PathBuf::from_str("/tmp/chan-0.sock").unwrap();
+//! let stream = UnixChannel::connect(&path).unwrap();
+//! let pd_info = vec![PdInfo::for_cp(
+//!     "PD 101",
+//!     101,
+//!     115200,
+//!     OsdpFlag::EnforceSecure,
+//!     OsdpChannel::new::<UnixChannel>(Box::new(stream)),
+//!     [
+//!         0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
+//!         0x0e, 0x0f,
+//!     ],
+//! )];
 //! let mut cp = ControlPanel::new(pd_info).unwrap();
 //! cp.set_event_callback(|pd, event| {
 //!     println!("Received event from {pd}: {:?}", event);
 //!     0
 //! });
-//! loop {
-//!     cp.refresh();
-//!     let c = OsdpCommandCardRead::new_ascii(vec![0x55, 0xAA]);
-//!     cp.send_command(0, OsdpCommand::new(c));
-//! }
+//!
+//! // Send LED command to PD 0
+//! cp.send_command(0, OsdpCommand::Led(OsdpCommandLed::default()));
+//!
+//! // From the app main loop, refresh the CP state machine
+//! cp.refresh();
+//! thread::sleep(Duration::from_millis(50));
 //! ```
 //!
 //! #### Peripheral Device:
 //!
-//! A simplified (non-working) PD implementation:
+//! A simplified PD implementation:
 //!
-//! ```ignore
-//! use libosdp::{PdInfo, pd::PeripheralDevice, events::OsdpEvent};
+//! ```rust,no_run
+//! use libosdp::{
+//!     channel::{OsdpChannel, UnixChannel},
+//!     OsdpError, OsdpFlag, OsdpEvent, OsdpEventCardRead, PdCapEntity,
+//!     PdCapability, PdId, PdInfo, PeripheralDevice,
+//! };
+//! use std::{result::Result, thread, time::Duration, path::PathBuf, str::FromStr};
+//! let path = PathBuf::from_str("/tmp/conn-1").unwrap();
+//! let stream = UnixChannel::new(&path).unwrap();
+//! let pd_info = PdInfo::for_pd(
+//!     "PD 101",
+//!     101,
+//!     115200,
+//!     OsdpFlag::EnforceSecure,
+//!     PdId::from_number(101),
+//!     vec![PdCapability::CommunicationSecurity(PdCapEntity::new(1, 1))],
+//!     OsdpChannel::new::<UnixChannel>(Box::new(stream)),
+//!     [
+//!         0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+//!         0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+//!     ],
+//! );
 //!
-//! let pd_info = PdInfo::new(...);
-//! let mut pd = PeripheralDevice::new(&mut pd_info).unwrap();
+//! // Create a PD and setup a command callback closure.
+//! let mut pd = PeripheralDevice::new(pd_info).unwrap();
 //! pd.set_command_callback(|cmd| {
 //!     println!("Received command {:?}", cmd);
 //!     0
 //! });
-//! loop {
-//!     pd.refresh();
-//!     cp.notify_event(OsdpEvent::new(...));
-//! }
+//!
+//! // Notify the CP of an event on the PD.
+//! let card_read = OsdpEventCardRead::new_weigand(16, vec![0xa1, 0xb2]).unwrap();
+//! pd.notify_event(OsdpEvent::CardRead(card_read));
+//!
+//! // From the app main loop, refresh the PD state machine periodically
+//! pd.refresh();
+//! thread::sleep(Duration::from_millis(50));
 //! ```
 //!
 //! [1]: https://libosdp.sidcha.dev/protocol/

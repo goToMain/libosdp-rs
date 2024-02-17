@@ -92,8 +92,11 @@ impl PeripheralDevice {
     ///     PdInfo, PdId, PdCapability, PdCapEntity, OsdpFlag,
     ///     channel::{OsdpChannel, UnixChannel}, ControlPanel,
     /// };
+    /// use std::path::PathBuf;
+    /// use std::str::FromStr;
     ///
-    /// let stream = UnixChannel::new("conn-1").unwrap();
+    /// let path = PathBuf::from_str("/tmp/conn-0.sock").unwrap();
+    /// let stream = UnixChannel::new(&path).unwrap();
     /// let pd_info = vec![
     ///     PdInfo::for_pd(
     ///         "PD 101", 101, 115200,
