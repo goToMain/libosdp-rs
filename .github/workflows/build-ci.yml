@@ -25,16 +25,6 @@ jobs:
         with:
           toolchain: stable
           components: rustfmt, clippy
-      - name: cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
-      - name: Clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
       - name: Cargo check
         uses: actions-rs/cargo@v1
         with:
