@@ -10,7 +10,7 @@ on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
-    - 'v*' # Push events to matching Rust-v*, i.e. Rust-v1.0
+    - '*'
 
 jobs:
   publish:
