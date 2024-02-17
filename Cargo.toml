@@ -1,0 +1,8 @@
+[workspace]
+workspace.resolver = "2"
+
+members = [
+    "libosdp-sys",
+    "libosdp",
+    "osdpctl"
+]
