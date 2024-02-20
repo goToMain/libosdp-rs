@@ -10,7 +10,9 @@ on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
-    - '*'
+    - 'libosdp-sys-v*'
+    - 'libosdp-v*'
+    - 'osdpctl-v*'
 
 jobs:
   publish:
@@ -24,7 +26,7 @@ jobs:
       with:
         toolchain: stable
         override: true
-    - uses: katyo/publish-crates@v2
-      with:
-        registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        ignore-unpublished-changes: true
+    - run: cargo publish --token ${CRATES_TOKEN} -p $(echo ${REL_TAG} | perl -pe 's/([a-z\-]+)-v.*/\1/')
+      env:
+        CRATES_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        REL_TAG: ${{ github.ref_name }}
