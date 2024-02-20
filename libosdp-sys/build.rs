@@ -3,8 +3,8 @@ use std::{
     path::{Path, PathBuf},
     process::Command,
 };
-
 use anyhow::Context;
+use build_target::Os;
 type Result<T> = anyhow::Result<T, anyhow::Error>;
 
 fn path_join(root: &str, path: &str) -> String {
@@ -101,8 +101,12 @@ fn main() -> Result<()> {
         .include("vendor/include")
         .include("vendor/utils/include")
         .warnings(true)
-        .warnings_into_errors(true)
         .include(&out_dir);
+
+    if Os::target().unwrap() != Os::Windows {
+        println!("Got here!");
+        build = build.warnings_into_errors(true)
+    }
 
     let source_files = vec![
         "vendor/utils/src/list.c",
