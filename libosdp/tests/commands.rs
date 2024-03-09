@@ -6,11 +6,10 @@
 use std::{sync::MutexGuard, thread, time};
 
 use libosdp::{
-    channel::{MemoryChannel, Read, Write},
-    ControlPanel, OsdpCommand, OsdpCommandBuzzer, OsdpEvent, OsdpEventCardRead, PeripheralDevice,
+    ControlPanel, OsdpCommand, OsdpCommandBuzzer, OsdpEvent, OsdpEventCardRead, PeripheralDevice, Channel,
 };
 
-use crate::common::{device::CpDevice, device::PdDevice, threadbus::ThreadBus};
+use crate::common::{device::CpDevice, device::PdDevice, threadbus::ThreadBus, memory_channel::MemoryChannel};
 
 mod common;
 
@@ -42,8 +41,8 @@ fn test_thread_bus_channel() -> Result<()> {
 fn test_commands() -> Result<()> {
     common::setup();
     let (cp_bus, pd_bus) = MemoryChannel::new();
-    let pd = PdDevice::new(pd_bus)?;
-    let cp = CpDevice::new(cp_bus)?;
+    let pd = PdDevice::new(Box::new(pd_bus))?;
+    let cp = CpDevice::new(Box::new(cp_bus))?;
 
     thread::sleep(time::Duration::from_secs(2));
     loop {

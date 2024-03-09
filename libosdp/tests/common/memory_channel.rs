@@ -3,10 +3,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-use alloc::sync::Arc;
-use ringbuf::HeapRb;
+use std::{sync::Arc, io::{Write, Read}};
 
-use super::Channel;
+use libosdp::ChannelError;
+use ringbuf::HeapRb;
 
 /// An in-memory OSDP channel suitable for testing
 pub struct MemoryChannel {
@@ -45,22 +45,22 @@ impl MemoryChannel {
     }
 }
 
-impl super::Write for MemoryChannel {
-    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        self.sender.write(buf)
-    }
-    fn flush(&mut self) -> std::io::Result<()> {
-        Ok(())
-    }
-}
-impl super::Read for MemoryChannel {
-    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
-        self.receiver.read(buf)
-    }
-}
-
-impl Channel for MemoryChannel {
+impl libosdp::Channel for MemoryChannel {
     fn get_id(&self) -> i32 {
         self.id
+    }
+
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize, libosdp::ChannelError> {
+        self.receiver.read(buf)
+            .map_err(ChannelError::from)
+    }
+
+    fn write(&mut self, buf: &[u8]) -> Result<usize, libosdp::ChannelError> {
+        self.sender.write(buf)
+            .map_err(ChannelError::from)
+    }
+
+    fn flush(&mut self) -> Result<(), libosdp::ChannelError> {
+        Ok(())
     }
 }

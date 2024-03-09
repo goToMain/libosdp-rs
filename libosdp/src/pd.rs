@@ -12,13 +12,12 @@
 //! happens on the PD itself (such as card read, key press, etc.,) snd sends it
 //! to the CP.
 
-use crate::types::{PdCapability, PdInfo};
+use crate::{PdCapability, PdInfo};
 #[cfg(feature = "std")]
 use crate::{
     file::{impl_osdp_file_ops_for, OsdpFile, OsdpFileOps},
     OsdpCommand, OsdpError, OsdpEvent,
 };
-use alloc::vec::Vec;
 use core::ffi::c_void;
 use log::{debug, error, info, warn};
 
@@ -63,9 +62,8 @@ where
     trampoline::<F>
 }
 
-fn pd_setup(info: PdInfo) -> Result<*mut c_void> {
-    let info = info.as_struct();
-    let ctx = unsafe { libosdp_sys::osdp_pd_setup(&info) };
+fn pd_setup(mut info: PdInfo) -> Result<*mut c_void> {
+    let ctx = unsafe { libosdp_sys::osdp_pd_setup(&info.as_struct()) };
     if ctx.is_null() {
         Err(OsdpError::Setup)
     } else {

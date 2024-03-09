@@ -14,20 +14,17 @@ categories = ["development-tools", "embedded"]
 
 [dependencies]
 bitflags = "2.4.0"
-embedded-io = "0.6.1"
-libosdp-sys = "0.1.5"
+libosdp-sys = "3.0.2"
 log = "0.4.20"
-multiqueue = "0.3.2"
 once_cell = "1.18.0"
-parking_lot = { version = "0.12.1", optional = true }
-ringbuf = "0.3.3"
 serde = { version = "1.0.192", features = ["derive"] }
-spin = "0.9.8"
 thiserror = { version = "1.0.50", optional = true }
 
 [dev-dependencies]
 env_logger = "0.10.0"
+multiqueue = "0.3.2"
+ringbuf = "0.3.3"
 
 [features]
 default = ["std"]
-std = ["thiserror", "parking_lot"]
+std = ["thiserror"]

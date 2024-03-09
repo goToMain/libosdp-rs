@@ -5,21 +5,11 @@
 
 use multiqueue::{BroadcastReceiver, BroadcastSender};
 use std::{
-    collections::hash_map::DefaultHasher,
     fmt::Debug,
-    hash::{Hash, Hasher},
     io::Error,
     io::ErrorKind,
     sync::Mutex,
 };
-
-fn str_to_channel_id(key: &str) -> i32 {
-    let mut hasher = DefaultHasher::new();
-    key.hash(&mut hasher);
-    let mut id: u64 = hasher.finish();
-    id = (id >> 32) ^ id & 0xffffffff;
-    id as i32
-}
 
 pub struct ThreadBus {
     name: String,
@@ -33,7 +23,7 @@ impl ThreadBus {
         let (send, recv) = multiqueue::broadcast_queue(4);
         Self {
             name: name.into(),
-            id: str_to_channel_id(name),
+            id: super::str_to_channel_id(name),
             send: Mutex::new(send),
             recv: Mutex::new(recv),
         }
@@ -62,8 +52,12 @@ impl Debug for ThreadBus {
     }
 }
 
-impl std::io::Read for ThreadBus {
-    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+impl libosdp::Channel for ThreadBus {
+    fn get_id(&self) -> i32 {
+        self.id
+    }
+
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize, libosdp::ChannelError> {
         let v = self.recv.lock().unwrap().try_recv().map_err(|e| match e {
             std::sync::mpsc::TryRecvError::Empty => Error::new(ErrorKind::WouldBlock, "No data"),
             std::sync::mpsc::TryRecvError::Disconnected => {
@@ -73,10 +67,8 @@ impl std::io::Read for ThreadBus {
         buf[..v.len()].copy_from_slice(&v[..]);
         Ok(v.len())
     }
-}
 
-impl std::io::Write for ThreadBus {
-    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+    fn write(&mut self, buf: &[u8]) -> Result<usize, libosdp::ChannelError> {
         let v = buf.into();
         self.send.lock().unwrap().try_send(v).map_err(|e| match e {
             std::sync::mpsc::TrySendError::Full(_) => Error::new(ErrorKind::WouldBlock, "No space"),
@@ -87,13 +79,7 @@ impl std::io::Write for ThreadBus {
         Ok(buf.len())
     }
 
-    fn flush(&mut self) -> std::io::Result<()> {
+    fn flush(&mut self) -> Result<(), libosdp::ChannelError> {
         Ok(())
-    }
-}
-
-impl libosdp::channel::Channel for ThreadBus {
-    fn get_id(&self) -> i32 {
-        self.id
     }
 }

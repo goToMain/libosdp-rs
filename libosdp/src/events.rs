@@ -9,7 +9,6 @@
 //! module is responsible to handling such events though [`OsdpEvent`].
 
 use crate::OsdpError;
-use alloc::vec::Vec;
 use serde::{Deserialize, Serialize};
 
 use super::ConvertEndian;

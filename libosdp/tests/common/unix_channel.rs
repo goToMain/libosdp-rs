@@ -5,7 +5,6 @@
 
 //! OSDP unix channel
 
-use super::Channel;
 use core::time::Duration;
 use std::{
     io::{Read, Write},
@@ -15,7 +14,9 @@ use std::{
     thread,
 };
 
-type Result<T> = std::result::Result<T, crate::OsdpError>;
+use libosdp::ChannelError;
+
+type Result<T> = std::result::Result<T, libosdp::OsdpError>;
 
 /// A reference OSDP channel implementation for unix domain socket.
 #[derive(Debug)]
@@ -59,24 +60,23 @@ impl UnixChannel {
     }
 }
 
-impl Read for UnixChannel {
-    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
-        self.stream.read(buf)
-    }
-}
-
-impl Write for UnixChannel {
-    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        self.stream.write(buf)
-    }
-
-    fn flush(&mut self) -> std::io::Result<()> {
-        self.stream.flush()
-    }
-}
-
-impl Channel for UnixChannel {
+impl libosdp::Channel for UnixChannel {
     fn get_id(&self) -> i32 {
         self.id
+    }
+
+    fn read(&mut self, buf: &mut [u8]) -> std::prelude::v1::Result<usize, libosdp::ChannelError> {
+        self.stream.read(buf)
+            .map_err(ChannelError::from)
+    }
+
+    fn write(&mut self, buf: &[u8]) -> std::prelude::v1::Result<usize, libosdp::ChannelError> {
+        self.stream.write(buf)
+            .map_err(ChannelError::from)
+    }
+
+    fn flush(&mut self) -> std::prelude::v1::Result<(), libosdp::ChannelError> {
+        self.stream.flush()
+            .map_err(ChannelError::from)
     }
 }

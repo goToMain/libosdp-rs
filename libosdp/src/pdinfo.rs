@@ -4,10 +4,54 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use alloc::ffi::CString;
+use core::ffi::c_void;
 
-use crate::channel::OsdpChannel;
+use super::{OsdpFlag, PdCapability, PdId, Channel, ChannelError};
 
-use super::{OsdpFlag, PdCapability, PdId};
+unsafe extern "C" fn raw_read(data: *mut c_void, buf: *mut u8, len: i32) -> i32 {
+    let channel: *mut Box<dyn Channel> = data as *mut _;
+    let channel = channel.as_mut().unwrap();
+    let mut read_buf = vec![0u8; len as usize];
+    match channel.read(&mut read_buf) {
+        Ok(n) => {
+            let src_ptr = read_buf.as_mut_ptr();
+            core::ptr::copy_nonoverlapping(src_ptr, buf, len as usize);
+            n as i32
+        }
+        Err(ChannelError::WouldBlock) => 0,
+        Err(_) => -1,
+    }
+}
+
+unsafe extern "C" fn raw_write(data: *mut c_void, buf: *mut u8, len: i32) -> i32 {
+    let channel: *mut Box<dyn Channel> = data as *mut _;
+    let channel = channel.as_mut().unwrap();
+    let mut write_buf = vec![0u8; len as usize];
+    core::ptr::copy_nonoverlapping(buf, write_buf.as_mut_ptr(), len as usize);
+    match channel.as_mut().write(&write_buf) {
+        Ok(n) => n as i32,
+        Err(ChannelError::WouldBlock) => 0,
+        Err(_) => -1,
+    }
+}
+
+unsafe extern "C" fn raw_flush(data: *mut c_void) {
+    let channel: *mut Box<dyn Channel> = data as *mut _;
+    let channel = channel.as_mut().unwrap();
+    let _ = channel.as_mut().flush();
+}
+
+fn into_osdp_channel(channel: Box<dyn Channel>) -> libosdp_sys::osdp_channel {
+    let id = channel.get_id();
+    let data = Box::into_raw(Box::new(channel));
+    libosdp_sys::osdp_channel {
+        id,
+        data: data as *mut c_void,
+        recv: Some(raw_read),
+        send: Some(raw_write),
+        flush: Some(raw_flush),
+    }
+}
 
 /// OSDP PD Information. This struct is used to describe a PD to LibOSDP
 #[derive(Debug)]
@@ -18,7 +62,7 @@ pub struct PdInfo {
     flags: OsdpFlag,
     id: PdId,
     cap: Vec<libosdp_sys::osdp_pd_cap>,
-    channel: OsdpChannel,
+    channel: Option<Box<dyn Channel>>,
     scbk: [u8; 16],
 }
 
@@ -46,7 +90,7 @@ impl PdInfo {
         flags: OsdpFlag,
         id: PdId,
         cap: Vec<PdCapability>,
-        channel: OsdpChannel,
+        channel: Box<dyn Channel>,
         scbk: [u8; 16],
     ) -> Self {
         let name = CString::new(name).unwrap();
@@ -58,7 +102,7 @@ impl PdInfo {
             flags,
             id,
             cap,
-            channel,
+            channel: Some(channel),
             scbk,
         }
     }
@@ -80,7 +124,7 @@ impl PdInfo {
         address: i32,
         baud_rate: i32,
         flags: OsdpFlag,
-        channel: OsdpChannel,
+        channel: Box<dyn Channel>,
         scbk: [u8; 16],
     ) -> Self {
         let name = CString::new(name).unwrap();
@@ -91,13 +135,13 @@ impl PdInfo {
             flags,
             id: PdId::default(),
             cap: vec![],
-            channel,
+            channel: Some(channel),
             scbk,
         }
     }
 
-    /// Returns the equivalent C struct
-    pub fn as_struct(&self) -> libosdp_sys::osdp_pd_info_t {
+    pub fn as_struct(&mut self) -> libosdp_sys::osdp_pd_info_t {
+        let channel = into_osdp_channel(self.channel.take().unwrap());
         libosdp_sys::osdp_pd_info_t {
             name: self.name.as_ptr(),
             baud_rate: self.baud_rate,
@@ -105,7 +149,7 @@ impl PdInfo {
             flags: self.flags.bits() as i32,
             id: self.id.clone().into(),
             cap: self.cap.as_ptr(),
-            channel: self.channel.as_struct(),
+            channel,
             scbk: self.scbk.as_ptr(),
         }
     }

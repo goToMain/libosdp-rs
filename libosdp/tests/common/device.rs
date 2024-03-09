@@ -9,9 +9,8 @@ use std::{
 };
 
 use libosdp::{
-    channel::{Channel, OsdpChannel},
-    ControlPanel, OsdpCommand, OsdpEvent, OsdpFlag, PdCapEntity, PdCapability, PdId, PdInfo,
-    PeripheralDevice,
+    ControlPanel, OsdpCommand, OsdpEvent, OsdpFlag,
+    PdCapEntity, PdCapability, PdId, PdInfo, PeripheralDevice,
 };
 type Result<T> = core::result::Result<T, libosdp::OsdpError>;
 
@@ -21,13 +20,13 @@ pub struct CpDevice {
 }
 
 impl CpDevice {
-    pub fn new<T: Channel + 'static>(bus: T) -> Result<Self> {
+    pub fn new(bus: Box<dyn libosdp::Channel>) -> Result<Self> {
         let pd_info = vec![PdInfo::for_cp(
             "PD 101",
             101,
             115200,
             OsdpFlag::empty(),
-            OsdpChannel::new::<T>(Box::new(bus)),
+            bus,
             [
                 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
                 0x0e, 0x0f,
@@ -74,7 +73,7 @@ pub struct PdDevice {
 }
 
 impl PdDevice {
-    pub fn new<T: Channel + 'static>(bus: T) -> Result<Self> {
+    pub fn new(bus: Box<dyn libosdp::Channel>) -> Result<Self> {
         let pd_info = PdInfo::for_pd(
             "PD 101",
             101,
@@ -86,7 +85,7 @@ impl PdDevice {
                 PdCapability::AudibleOutput(PdCapEntity::new(1, 1)),
                 PdCapability::LedControl(PdCapEntity::new(1, 1)),
             ],
-            OsdpChannel::new::<T>(Box::new(bus)),
+            bus,
             [
                 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
                 0x0e, 0x0f,
