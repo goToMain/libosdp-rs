@@ -1,10 +1,10 @@
+use anyhow::Context;
+use build_target::Os;
 use std::{
     borrow::BorrowMut,
     path::{Path, PathBuf},
     process::Command,
 };
-use anyhow::Context;
-use build_target::Os;
 type Result<T> = anyhow::Result<T, anyhow::Error>;
 
 fn path_join(root: &str, path: &str) -> String {
@@ -103,8 +103,10 @@ fn main() -> Result<()> {
         .warnings(true)
         .include(&out_dir);
 
-    if Os::target().unwrap() != Os::Windows {
-        println!("Got here!");
+    if std::env::var("WIN_WERROR").is_err() && Os::target().unwrap() != Os::Windows {
+        // TODO: Windows builds warn about various things which are legitimate
+        // in other platforms. Over time, we need to assess each case and
+        // handle it the way Windows likes us to do them and then remove this.
         build = build.warnings_into_errors(true)
     }
 
@@ -134,11 +136,17 @@ fn main() -> Result<()> {
     }
 
     if cfg!(feature = "packet_trace") {
-        build = build.define("CONFIG_OSDP_PACKET_TRACE", "1");
+        build = build
+            .define("CONFIG_OSDP_PACKET_TRACE", "1")
+            .file("vendor/utils/src/pcap_gen.c")
+            .file("vendor/src/osdp_pcap.c");
     }
 
     if cfg!(feature = "data_trace") {
-        build = build.define("CONFIG_OSDP_DATA_TRACE", "1");
+        build = build
+            .define("CONFIG_OSDP_DATA_TRACE", "1")
+            .file("vendor/utils/src/pcap_gen.c")
+            .file("vendor/src/osdp_pcap.c");
     }
 
     build.compile("libosdp.a");
