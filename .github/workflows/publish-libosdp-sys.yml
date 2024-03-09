@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-name: Publish libosdp_sys
+name: Publish libosdp-sys
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ on:
 
 jobs:
   cross_platform_check:
-    name: Build libosdp_sys on ${{ matrix.os }}
+    name: Build libosdp-sys on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -29,11 +29,11 @@ jobs:
       with:
         toolchain: stable
         override: true
-    - run: cargo build -p libosdp_sys
+    - run: cargo build -p libosdp-sys
 
   publish:
     needs: [cross_platform_check]
-    name: Publish libosdp_sys
+    name: Publish libosdp-sys
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -43,7 +43,7 @@ jobs:
       with:
         toolchain: stable
         override: true
-    - run: cargo publish --token ${CRATES_TOKEN} -p libosdp_sys
+    - run: cargo publish --token ${CRATES_TOKEN} -p libosdp-sys
       env:
         CRATES_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         REL_TAG: ${{ github.ref_name }}
