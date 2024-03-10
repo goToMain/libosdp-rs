@@ -6,119 +6,56 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 //! # LibOSDP - Open Supervised Device Protocol Library
 //!
-//! This is an open source implementation of IEC 60839-11-5 Open Supervised
-//! Device Protocol (OSDP). The protocol is intended to improve interoperability
-//! among access control and security products. It supports Secure Channel (SC)
-//! for encrypted and authenticated communication between configured devices.
+//! This is a cross-platform open source implementation of IEC 60839-11-5 Open Supervised Device
+//! Protocol (OSDP). The protocol is intended to improve interoperability among access control and
+//! security products. It supports Secure Channel (SC) for encrypted and authenticated
+//! communication between configured devices.
 //!
-//! OSDP describes the communication protocol for interfacing one or more
-//! Peripheral Devices (PD) to a Control Panel (CP) over a two-wire RS-485
-//! multi-drop serial communication channel. Nevertheless, this protocol can be
-//! used to transfer secure data over any stream based physical channel. Read
-//! more about OSDP [here][1].
+//! OSDP describes the communication protocol for interfacing one or more Peripheral Devices (PD)
+//! to a Control Panel (CP) over a two-wire RS-485 multi-drop serial communication channel.
+//! Nevertheless, this protocol can be used to transfer secure data over any stream based physical
+//! channel. Read more about OSDP [here][1].
 //!
-//! This protocol is developed and maintained by [Security Industry Association][2]
-//! (SIA).
+//! This protocol is developed and maintained by [Security Industry Association][2] (SIA).
 //!
-//! ## Salient Features of LibOSDP
+//! ## Getting started
 //!
-//!   - Supports secure channel communication (AES-128)
-//!   - Can be used to setup a PD or CP mode of operation
-//!   - Exposes a well defined contract though a single header file
-//!   - No run-time memory allocation. All memory is allocated at init-time
-//!   - No external dependencies (for ease of cross compilation)
-//!   - Fully non-blocking, asynchronous design
-//!   - Provides Python3 and Rust bindings for the C library for faster
-//!     testing/integration
+//! A device complying with OSDP can either be a CP or a PD. There can be only one CP on a bus
+//! which can talk to multiple PDs. LibOSDP allows your application to work either as a CP or a
+//! PD so depending on what you want to do you have to do some things differently.
 //!
-//! ## Quick start
+//! LibOSDP creates the following constructs which allow interactions between devices on the OSDP
+//! bus. These should not be confused with the protocol specified terminologies that may use the
+//! same names. They are:
+//!   - Channel - Something that allows two OSDP devices to talk to each other
+//!   - Commands - A call for action from a control panel (CP) to peripheral device (PD)
+//!   - Events - A call for action from peripheral device (PD) to control panel (CP)
 //!
-//! #### Control Panel:
+//! The app starts by defining a type that implements the [`Channel`] trait; this allows your
+//! devices to communicate with other osdp devices on the bus. Then you describe the PD you are
+//!   - talking to on the bus (in case of CP mode of operation) or,
+//!   - going to behave as on the bus (in case of PD mode of operation)
+//! by using the [`PdInfo`] struct.
 //!
-//! A simplified CP implementation:
+//! You can use the `PdInfo` (or a vector of `PdInfo` structs in case of CP mode) to create a
+//! [`ControlPanel`] or [`PeripheralDevice`] context. Both these contexts have a non-blocking
+//! method `refresh()` that needs to called as frequently as your app can permit. To meet the OSDP
+//! specified timing requirements, your app must call this method at least once every 50ms.
 //!
-//! ```rust,no_run
-//! use libosdp::{
-//!     channel::{OsdpChannel, UnixChannel}, OsdpCommand, OsdpCommandLed,
-//!     ControlPanel, OsdpError, OsdpFlag, PdInfo,
-//! };
-//! use std::{
-//!     result::Result, thread, time::Duration,
-//!     path::PathBuf, str::FromStr
-//! };
+//! After this point, the CP context can,
+//!   - send commands to any one of the PDs (to control LEDs, Buzzers, Input/Output pins, etc.,)
+//!   - register a closure for events that are sent from a PD
 //!
-//! let path = PathBuf::from_str("/tmp/chan-0.sock").unwrap();
-//! let stream = UnixChannel::connect(&path).unwrap();
-//! let pd_info = vec![PdInfo::for_cp(
-//!     "PD 101",
-//!     101,
-//!     115200,
-//!     OsdpFlag::EnforceSecure,
-//!     OsdpChannel::new::<UnixChannel>(Box::new(stream)),
-//!     [
-//!         0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
-//!         0x0e, 0x0f,
-//!     ],
-//! )];
-//! let mut cp = ControlPanel::new(pd_info).unwrap();
-//! cp.set_event_callback(|pd, event| {
-//!     println!("Received event from {pd}: {:?}", event);
-//!     0
-//! });
+//! and the PD context can,
+//!   - notify it's controlling CP about an event (card read, key press, tamper, etc.,)
+//!   - register a closure for commands issued by the CP
 //!
-//! // Send LED command to PD 0
-//! cp.send_command(0, OsdpCommand::Led(OsdpCommandLed::default()));
-//!
-//! // From the app main loop, refresh the CP state machine
-//! cp.refresh();
-//! thread::sleep(Duration::from_millis(50));
-//! ```
-//!
-//! #### Peripheral Device:
-//!
-//! A simplified PD implementation:
-//!
-//! ```rust,no_run
-//! use libosdp::{
-//!     channel::{OsdpChannel, UnixChannel},
-//!     OsdpError, OsdpFlag, OsdpEvent, OsdpEventCardRead, PdCapEntity,
-//!     PdCapability, PdId, PdInfo, PeripheralDevice,
-//! };
-//! use std::{result::Result, thread, time::Duration, path::PathBuf, str::FromStr};
-//! let path = PathBuf::from_str("/tmp/conn-1").unwrap();
-//! let stream = UnixChannel::new(&path).unwrap();
-//! let pd_info = PdInfo::for_pd(
-//!     "PD 101",
-//!     101,
-//!     115200,
-//!     OsdpFlag::EnforceSecure,
-//!     PdId::from_number(101),
-//!     vec![PdCapability::CommunicationSecurity(PdCapEntity::new(1, 1))],
-//!     OsdpChannel::new::<UnixChannel>(Box::new(stream)),
-//!     [
-//!         0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-//!         0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-//!     ],
-//! );
-//!
-//! // Create a PD and setup a command callback closure.
-//! let mut pd = PeripheralDevice::new(pd_info).unwrap();
-//! pd.set_command_callback(|cmd| {
-//!     println!("Received command {:?}", cmd);
-//!     0
-//! });
-//!
-//! // Notify the CP of an event on the PD.
-//! let card_read = OsdpEventCardRead::new_weigand(16, vec![0xa1, 0xb2]).unwrap();
-//! pd.notify_event(OsdpEvent::CardRead(card_read));
-//!
-//! // From the app main loop, refresh the PD state machine periodically
-//! pd.refresh();
-//! thread::sleep(Duration::from_millis(50));
-//! ```
+//! You can find a template implementation for CP app [here][3] and PD app [here][4].
 //!
 //! [1]: https://libosdp.sidcha.dev/protocol/
 //! [2]: https://www.securityindustry.org/industry-standards/open-supervised-device-protocol/
+//! [3]: https://docs.rs/crate/libosdp/latest/source/examples/cp.rs
+//! [4]: https://docs.rs/crate/libosdp/latest/source/examples/pd.rs
 
 #![warn(missing_debug_implementations)]
 #![warn(rust_2018_idioms)]

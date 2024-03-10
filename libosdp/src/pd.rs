@@ -81,37 +81,7 @@ unsafe impl Send for PeripheralDevice {}
 
 impl PeripheralDevice {
     /// Create a new Peripheral panel object for the list of PDs described by the
-    /// corresponding PdInfo list.
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use libosdp::{
-    ///     PdInfo, PdId, PdCapability, PdCapEntity, OsdpFlag,
-    ///     channel::{OsdpChannel, UnixChannel}, ControlPanel,
-    /// };
-    /// use std::path::PathBuf;
-    /// use std::str::FromStr;
-    ///
-    /// let path = PathBuf::from_str("/tmp/conn-0.sock").unwrap();
-    /// let stream = UnixChannel::new(&path).unwrap();
-    /// let pd_info = vec![
-    ///     PdInfo::for_pd(
-    ///         "PD 101", 101, 115200,
-    ///         OsdpFlag::EnforceSecure,
-    ///         PdId::from_number(101),
-    ///         vec![
-    ///             PdCapability::CommunicationSecurity(PdCapEntity::new(1, 1)),
-    ///         ],
-    ///         OsdpChannel::new::<UnixChannel>(Box::new(stream)),
-    ///         [
-    ///             0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-    ///             0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-    ///         ]
-    ///     ),
-    /// ];
-    /// let mut cp = ControlPanel::new(pd_info).unwrap();
-    /// ```
+    /// corresponding PdInfo struct.
     pub fn new(info: PdInfo) -> Result<Self> {
         unsafe { libosdp_sys::osdp_set_log_callback(Some(log_handler)) };
         Ok(Self {

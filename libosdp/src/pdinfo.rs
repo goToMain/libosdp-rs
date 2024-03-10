@@ -140,6 +140,7 @@ impl PdInfo {
         }
     }
 
+    /// Get a C-repr struct for PdInfo that LibOSDP can operate on.
     pub fn as_struct(&mut self) -> libosdp_sys::osdp_pd_info_t {
         let channel = into_osdp_channel(self.channel.take().unwrap());
         libosdp_sys::osdp_pd_info_t {

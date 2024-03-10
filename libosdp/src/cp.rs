@@ -3,8 +3,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-//! The CP is responsible to connecting to and managing multiple PDs. It is able
-//! to send commands to and receive events from PDs.
+//! The Control Panel (CP) is responsible to connecting to and managing multiple Peripheral Devices
+//! (PD) on the OSDP bus. It can send commands to and receive events from PDs.
 
 #[cfg(feature = "std")]
 use crate::file::{impl_osdp_file_ops_for, OsdpFile, OsdpFileOps};
@@ -72,35 +72,7 @@ pub struct ControlPanel {
 unsafe impl Send for ControlPanel {}
 
 impl ControlPanel {
-    /// Create a new control panel object for the list of PDs described by the
-    /// corresponding PdInfo list.
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// use libosdp::{
-    ///     PdInfo, OsdpFlag, channel::{OsdpChannel, UnixChannel},
-    ///     ControlPanel, OsdpCommand
-    /// };
-    /// use std::path::PathBuf;
-    /// use std::str::FromStr;
-    ///
-    /// let path = PathBuf::from_str("/tmp/conn-0.sock").unwrap();
-    /// let stream = UnixChannel::connect(&path).unwrap();
-    /// let pd_info = vec![
-    ///     PdInfo::for_cp(
-    ///         "PD 101", 101,
-    ///         115200,
-    ///         OsdpFlag::EnforceSecure,
-    ///         OsdpChannel::new::<UnixChannel>(Box::new(stream)),
-    ///         [
-    ///             0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-    ///             0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-    ///         ]
-    ///     ),
-    /// ];
-    /// let mut cp = ControlPanel::new(pd_info).unwrap();
-    /// ```
+    /// Create a new CP context for the list of PDs described by the [`PdInfo`] vector.
     pub fn new(mut pd_info: Vec<PdInfo>) -> Result<Self> {
         if pd_info.len() > 126 {
             return Err(OsdpError::PdInfo("max PD count exceeded"));
