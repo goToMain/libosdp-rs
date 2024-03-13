@@ -14,14 +14,14 @@ categories = ["development-tools", "embedded"]
 
 [dependencies]
 bitflags = "2.4.0"
-libosdp-sys = "3.0.2"
+libosdp-sys = "3.0.3"
 log = "0.4.20"
 once_cell = "1.18.0"
 serde = { version = "1.0.192", features = ["derive"] }
 thiserror = { version = "1.0.50", optional = true }
 
 [dev-dependencies]
-env_logger = "0.10.0"
+env_logger = "0.11.3"
 multiqueue = "0.3.2"
 ringbuf = "0.3.3"
 
