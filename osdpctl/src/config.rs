@@ -111,7 +111,7 @@ impl CpConfig {
                 name: config.get(&section, "name").unwrap(),
                 channel: config.get(&section, "channel").unwrap(),
                 address: config.getuint(&section, "address").unwrap().unwrap() as i32,
-                key_store: KeyStore::create(runtime_dir.join("key.store"), &key)?,
+                key_store: KeyStore::create(runtime_dir.join("key.store"), key)?,
                 flags: OsdpFlag::empty(),
             });
         }

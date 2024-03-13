@@ -57,11 +57,11 @@ impl ConvertEndian for [u8; 4] {
         ((self[0] as u32) << 24)
             | ((self[1] as u32) << 16)
             | ((self[2] as u32) << 8)
-            | ((self[3] as u32) << 0)
+            | (self[3] as u32)
     }
 
     fn as_le(&self) -> u32 {
-        ((self[0] as u32) << 0)
+        (self[0] as u32)
             | ((self[1] as u32) << 8)
             | ((self[2] as u32) << 16)
             | ((self[3] as u32) << 24)
@@ -74,7 +74,7 @@ impl ConvertEndian for (u8, u8, u8) {
     }
 
     fn as_le(&self) -> u32 {
-        ((self.0 as u32) << 0) | ((self.1 as u32) << 8) | ((self.2 as u32) << 16)
+        (self.0 as u32) | ((self.1 as u32) << 8) | ((self.2 as u32) << 16)
     }
 }
 

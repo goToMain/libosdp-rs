@@ -61,7 +61,7 @@ impl FromStr for PdCapEntity {
                 num_items,
             })
         } else {
-            return Err(OsdpError::Parse(format!("PdCapEntry: {s}")));
+            Err(OsdpError::Parse(format!("PdCapEntry: {s}")))
         }
     }
 }
@@ -249,9 +249,9 @@ impl From<libosdp_sys::osdp_pd_cap> for PdCapability {
 }
 
 #[rustfmt::skip]
-impl Into<u8> for PdCapability {
-    fn into(self) -> u8 {
-        match self {
+impl From<PdCapability> for u8 {
+    fn from(val: PdCapability) -> Self {
+        match val {
             PdCapability::ContactStatusMonitoring(_) => {
                 libosdp_sys::osdp_pd_cap_function_code_e_OSDP_PD_CAP_CONTACT_STATUS_MONITORING as u8
             }

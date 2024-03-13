@@ -45,9 +45,9 @@ impl From<u32> for OsdpCardFormats {
     }
 }
 
-impl Into<u32> for OsdpCardFormats {
-    fn into(self) -> u32 {
-        match self {
+impl From<OsdpCardFormats> for u32 {
+    fn from(val: OsdpCardFormats) -> Self {
+        match val {
             OsdpCardFormats::Unspecified => {
                 libosdp_sys::osdp_event_cardread_format_e_OSDP_CARD_FMT_RAW_UNSPECIFIED
             }
@@ -118,7 +118,7 @@ impl OsdpEventCardRead {
 
 impl From<libosdp_sys::osdp_event_cardread> for OsdpEventCardRead {
     fn from(value: libosdp_sys::osdp_event_cardread) -> Self {
-        let direction = if value.direction == 1 { true } else { false };
+        let direction = value.direction == 1;
         let format = value.format.into();
         let len = value.length as usize;
         let (nr_bits, nr_bytes) = match format {
@@ -143,9 +143,7 @@ impl From<OsdpEventCardRead> for libosdp_sys::osdp_event_cardread {
             OsdpCardFormats::Weigand => value.nr_bits as i32,
             _ => value.data.len() as i32,
         };
-        for i in 0..value.data.len() {
-            data[i] = value.data[i];
-        }
+        data[..value.data.len()].copy_from_slice(&value.data[..]);
         libosdp_sys::osdp_event_cardread {
             reader_no: value.reader_no,
             format: value.format.clone().into(),
@@ -192,9 +190,7 @@ impl From<libosdp_sys::osdp_event_keypress> for OsdpEventKeyPress {
 impl From<OsdpEventKeyPress> for libosdp_sys::osdp_event_keypress {
     fn from(value: OsdpEventKeyPress) -> Self {
         let mut data = [0; libosdp_sys::OSDP_EVENT_KEYPRESS_MAX_DATALEN as usize];
-        for i in 0..value.data.len() {
-            data[i] = value.data[i];
-        }
+        data[..value.data.len()].copy_from_slice(&value.data[..]);
         libosdp_sys::osdp_event_keypress {
             reader_no: value.reader_no,
             length: value.data.len() as i32,
@@ -233,9 +229,7 @@ impl From<libosdp_sys::osdp_event_mfgrep> for OsdpEventMfgReply {
 impl From<OsdpEventMfgReply> for libosdp_sys::osdp_event_mfgrep {
     fn from(value: OsdpEventMfgReply) -> Self {
         let mut data = [0; libosdp_sys::OSDP_EVENT_MFGREP_MAX_DATALEN as usize];
-        for i in 0..value.data.len() {
-            data[i] = value.data[i];
-        }
+        data[..value.data.len()].copy_from_slice(&value.data[..]);
         libosdp_sys::osdp_event_mfgrep {
             vendor_code: value.vendor_code.as_le(),
             command: value.reply,
@@ -282,16 +276,16 @@ impl From<OsdpStatusReportType> for u32 {
     fn from(value: OsdpStatusReportType) -> Self {
         match value {
             OsdpStatusReportType::Input => {
-                libosdp_sys::osdp_status_report_type_OSDP_STATUS_REPORT_INPUT as u32
+                libosdp_sys::osdp_status_report_type_OSDP_STATUS_REPORT_INPUT
             }
             OsdpStatusReportType::Output => {
-                libosdp_sys::osdp_status_report_type_OSDP_STATUS_REPORT_OUTPUT as u32
+                libosdp_sys::osdp_status_report_type_OSDP_STATUS_REPORT_OUTPUT
             }
             OsdpStatusReportType::Remote => {
-                libosdp_sys::osdp_status_report_type_OSDP_STATUS_REPORT_REMOTE as u32
+                libosdp_sys::osdp_status_report_type_OSDP_STATUS_REPORT_REMOTE
             }
             OsdpStatusReportType::Local => {
-                libosdp_sys::osdp_status_report_type_OSDP_STATUS_REPORT_LOCAL as u32
+                libosdp_sys::osdp_status_report_type_OSDP_STATUS_REPORT_LOCAL
             }
         }
     }

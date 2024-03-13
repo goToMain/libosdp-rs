@@ -34,7 +34,7 @@ unsafe extern "C" fn raw_file_open(data: *mut c_void, file_id: i32, size: *mut i
     unsafe {
         *size = ctx.size as i32;
     }
-    return 0;
+    0
 }
 
 unsafe extern "C" fn raw_file_read(
@@ -54,7 +54,7 @@ unsafe extern "C" fn raw_file_read(
         Err(_) => -1,
     };
     std::ptr::copy_nonoverlapping(read_buf.as_mut_ptr(), buf as *mut u8, len as usize);
-    return len;
+    len
 }
 
 unsafe extern "C" fn raw_file_write(
@@ -82,7 +82,7 @@ unsafe extern "C" fn raw_file_close(data: *mut c_void) -> i32 {
         return -1;
     }
     let _ = ctx.file.take().unwrap();
-    return 0;
+    0
 }
 
 impl OsdpFile {

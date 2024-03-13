@@ -130,7 +130,7 @@ fn main() -> Result<()> {
             let config = sub_matches
                 .get_one::<String>("CONFIG")
                 .context("Device config file required")?;
-            let config = PathBuf::from_str(&config)?;
+            let config = PathBuf::from_str(config)?;
             let dev = DeviceConfig::new(&config, &rt_dir)?;
             let dest_path = cfg_dir.join(format!("{}.cfg", dev.name()));
             if dest_path.exists() {

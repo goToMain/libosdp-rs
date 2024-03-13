@@ -8,7 +8,6 @@ use std::{collections::hash_map::DefaultHasher, hash::{Hash, Hasher}};
 pub mod device;
 pub mod threadbus;
 pub mod memory_channel;
-pub mod unix_channel;
 
 pub fn setup() {
     env_logger::builder()

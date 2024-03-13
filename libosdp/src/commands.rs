@@ -280,9 +280,7 @@ impl From<libosdp_sys::osdp_cmd_text> for OsdpCommandText {
 impl From<OsdpCommandText> for libosdp_sys::osdp_cmd_text {
     fn from(value: OsdpCommandText) -> Self {
         let mut data = [0; libosdp_sys::OSDP_CMD_TEXT_MAX_LEN as usize];
-        for i in 0..value.data.len() {
-            data[i] = value.data[i];
-        }
+        data[..value.data.len()].copy_from_slice(&value.data[..]);
         libosdp_sys::osdp_cmd_text {
             reader: value.reader,
             control_code: value.control_code,
@@ -414,9 +412,7 @@ impl From<libosdp_sys::osdp_cmd_keyset> for OsdpCommandKeyset {
 impl From<OsdpCommandKeyset> for libosdp_sys::osdp_cmd_keyset {
     fn from(value: OsdpCommandKeyset) -> Self {
         let mut data = [0; libosdp_sys::OSDP_CMD_KEYSET_KEY_MAX_LEN as usize];
-        for i in 0..value.data.len() {
-            data[i] = value.data[i];
-        }
+        data[..value.data.len()].copy_from_slice(&value.data[..]);
         libosdp_sys::osdp_cmd_keyset {
             type_: value.key_type,
             length: value.data.len() as u8,
@@ -455,9 +451,7 @@ impl From<libosdp_sys::osdp_cmd_mfg> for OsdpCommandMfg {
 impl From<OsdpCommandMfg> for libosdp_sys::osdp_cmd_mfg {
     fn from(value: OsdpCommandMfg) -> Self {
         let mut data = [0; libosdp_sys::OSDP_CMD_MFG_MAX_DATALEN as usize];
-        for i in 0..value.data.len() {
-            data[i] = value.data[i];
-        }
+        data[..value.data.len()].copy_from_slice(&value.data[..]);
         libosdp_sys::osdp_cmd_mfg {
             vendor_code: value.vendor_code.as_le(),
             command: value.command,
