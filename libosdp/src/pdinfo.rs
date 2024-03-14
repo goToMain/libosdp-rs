@@ -41,10 +41,10 @@ unsafe extern "C" fn raw_flush(data: *mut c_void) {
     let _ = channel.as_mut().flush();
 }
 
-impl Into<libosdp_sys::osdp_channel> for Box<dyn Channel> {
-    fn into(self) -> libosdp_sys::osdp_channel {
-        let id = self.get_id();
-        let data = Box::into_raw(Box::new(self));
+impl From<Box<dyn Channel>> for libosdp_sys::osdp_channel {
+    fn from(val: Box<dyn Channel>) -> Self {
+        let id = val.get_id();
+        let data = Box::into_raw(Box::new(val));
         libosdp_sys::osdp_channel {
             id,
             data: data as *mut c_void,
@@ -178,7 +178,7 @@ impl PdInfo {
         if let Some(key) = self.scbk.as_mut() {
             scbk = key.as_mut_ptr();
         } else {
-            scbk = 0 as *mut u8;
+            scbk = std::ptr::null_mut::<u8>();
         }
         libosdp_sys::osdp_pd_info_t {
             name: self.name.as_ptr(),
