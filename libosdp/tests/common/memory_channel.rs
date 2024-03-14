@@ -3,7 +3,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-use std::{sync::Arc, io::{Write, Read}};
+use std::{
+    io::{Read, Write},
+    sync::Arc,
+};
 
 use libosdp::ChannelError;
 use ringbuf::HeapRb;
@@ -51,13 +54,11 @@ impl libosdp::Channel for MemoryChannel {
     }
 
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, libosdp::ChannelError> {
-        self.receiver.read(buf)
-            .map_err(ChannelError::from)
+        self.receiver.read(buf).map_err(ChannelError::from)
     }
 
     fn write(&mut self, buf: &[u8]) -> Result<usize, libosdp::ChannelError> {
-        self.sender.write(buf)
-            .map_err(ChannelError::from)
+        self.sender.write(buf).map_err(ChannelError::from)
     }
 
     fn flush(&mut self) -> Result<(), libosdp::ChannelError> {

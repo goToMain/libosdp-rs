@@ -142,8 +142,8 @@ impl CpConfig {
                     bail!("Only unix channel is supported for now")
                 }
                 let path = runtime_dir.join(format!("{}/{}.sock", d.name, parts[1]).as_str());
-                let stream = UnixChannel::connect(&path)
-                    .context("Unable to connect to PD channel")?;
+                let stream =
+                    UnixChannel::connect(&path).context("Unable to connect to PD channel")?;
                 Ok(PdInfo::for_cp(
                     &self.name,
                     d.address,

@@ -23,7 +23,7 @@ pub enum ChannelError {
     /// ready but LibOSDP required channel to be non-blocking so return "I would
     /// have blocked" instead)
     WouldBlock,
-    /// Channel failed irrecoverably. 
+    /// Channel failed irrecoverably.
     TransportError,
 }
 

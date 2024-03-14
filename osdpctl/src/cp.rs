@@ -29,8 +29,7 @@ fn setup(dev: &CpConfig, daemonize: bool) -> Result<()> {
 
 pub fn main(dev: CpConfig, daemonize: bool) -> Result<()> {
     setup(&dev, daemonize)?;
-    let pd_info = dev.pd_info()
-        .context("Failed to create PD info list")?;
+    let pd_info = dev.pd_info().context("Failed to create PD info list")?;
     let mut cp = ControlPanel::new(pd_info)?;
     cp.set_event_callback(|pd, event| {
         match event {

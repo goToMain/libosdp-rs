@@ -21,10 +21,12 @@ pub struct CpDevice {
 
 impl CpDevice {
     pub fn new(bus: Box<dyn libosdp::Channel>) -> Result<Self> {
+        #[rustfmt::skip]
         let pd_0_key = [
             0x94, 0x4b, 0x8e, 0xdd, 0xcb, 0xaa, 0x2b, 0x5f,
             0xe2, 0xb0, 0x14, 0x8d, 0x1b, 0x2f, 0x95, 0xc9
         ];
+
         let pd_0 = PdInfoBuilder::new()
             .name("PD 101")?
             .address(101)?
@@ -74,10 +76,12 @@ pub struct PdDevice {
 
 impl PdDevice {
     pub fn new(bus: Box<dyn libosdp::Channel>) -> Result<Self> {
+        #[rustfmt::skip]
         let key = [
             0x94, 0x4b, 0x8e, 0xdd, 0xcb, 0xaa, 0x2b, 0x5f,
             0xe2, 0xb0, 0x14, 0x8d, 0x1b, 0x2f, 0x95, 0xc9
         ];
+
         let pd_info = PdInfoBuilder::new()
             .name("PD 101")?
             .address(101)?

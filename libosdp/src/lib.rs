@@ -63,16 +63,16 @@
 
 extern crate alloc;
 
+mod channel;
+mod commands;
 mod cp;
+mod events;
 pub mod file;
 #[cfg(feature = "std")]
 mod pd;
-mod commands;
-mod events;
 mod pdcap;
 mod pdid;
 mod pdinfo;
-mod channel;
 
 // Re-export for convenience
 pub use channel::*;

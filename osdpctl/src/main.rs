@@ -42,10 +42,7 @@ fn cli() -> Command {
         .help_template(HELP_TEMPLATE)
         .subcommand_required(true)
         .arg_required_else_help(true)
-        .subcommand(
-            Command::new("list")
-                .about("List configured OSDP devices")
-        )
+        .subcommand(Command::new("list").about("List configured OSDP devices"))
         .subcommand(
             Command::new("create")
                 .about("Create a device specified by config")
@@ -86,16 +83,14 @@ fn cli() -> Command {
 }
 
 fn osdpctl_config_dir() -> Result<PathBuf> {
-    let mut cfg_dir = dirs::config_dir()
-        .expect("Failed to read system config directory");
+    let mut cfg_dir = dirs::config_dir().expect("Failed to read system config directory");
     cfg_dir.push("osdp");
     _ = std::fs::create_dir_all(&cfg_dir);
     Ok(cfg_dir)
 }
 
 fn device_runtime_dir() -> Result<PathBuf> {
-    let runtime_dir = dirs::runtime_dir()
-        .unwrap_or(PathBuf::from_str("/tmp")?);
+    let runtime_dir = dirs::runtime_dir().unwrap_or(PathBuf::from_str("/tmp")?);
     std::fs::create_dir_all(&runtime_dir)?;
     Ok(runtime_dir)
 }
@@ -119,8 +114,8 @@ fn main() -> Result<()> {
                 .get_one::<String>("DEV")
                 .context("Device name is required")?;
             let config_path = cfg_dir.join(format!("{name}.cfg"));
-            let editor = std::env::var("EDITOR")
-                .context("Environment variable EDITOR is not set")?;
+            let editor =
+                std::env::var("EDITOR").context("Environment variable EDITOR is not set")?;
             std::process::Command::new(editor)
                 .arg(&config_path)
                 .status()
@@ -134,7 +129,10 @@ fn main() -> Result<()> {
             let dev = DeviceConfig::new(&config, &rt_dir)?;
             let dest_path = cfg_dir.join(format!("{}.cfg", dev.name()));
             if dest_path.exists() {
-                bail!("A device config with the name '{}' already exists!", dev.name());
+                bail!(
+                    "A device config with the name '{}' already exists!",
+                    dev.name()
+                );
             }
             std::fs::copy(&config, &dest_path).unwrap();
             println!("Created new device '{}'.", dev.name())

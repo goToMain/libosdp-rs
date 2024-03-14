@@ -3,11 +3,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-use std::{collections::hash_map::DefaultHasher, hash::{Hash, Hasher}};
+use std::{
+    collections::hash_map::DefaultHasher,
+    hash::{Hash, Hasher},
+};
 
 pub mod device;
-pub mod threadbus;
 pub mod memory_channel;
+pub mod threadbus;
 
 pub fn setup() {
     env_logger::builder()

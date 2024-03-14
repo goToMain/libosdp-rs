@@ -4,12 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use multiqueue::{BroadcastReceiver, BroadcastSender};
-use std::{
-    fmt::Debug,
-    io::Error,
-    io::ErrorKind,
-    sync::Mutex,
-};
+use std::{fmt::Debug, io::Error, io::ErrorKind, sync::Mutex};
 
 pub struct ThreadBus {
     name: String,

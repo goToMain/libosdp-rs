@@ -13,8 +13,7 @@ struct OsdpChannel;
 impl OsdpChannel {
     pub fn new(_path: &str) -> Self {
         // setup device
-        Self {
-        }
+        Self {}
     }
 }
 
@@ -48,10 +47,13 @@ fn main() -> Result<(), OsdpError> {
         .init();
     let args: Vec<String> = std::env::args().collect();
     let channel = OsdpChannel::new(&args[1]);
+
+    #[rustfmt::skip]
     let key = [
         0x94, 0x4b, 0x8e, 0xdd, 0xcb, 0xaa, 0x2b, 0x5f,
         0xe2, 0xb0, 0x14, 0x8d, 0x1b, 0x2f, 0x95, 0xc9
     ];
+
     let pd_info = PdInfoBuilder::new()
         .name("PD 101")?
         .address(101)?
