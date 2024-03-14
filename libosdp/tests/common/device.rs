@@ -9,8 +9,8 @@ use std::{
 };
 
 use libosdp::{
-    ControlPanel, OsdpCommand, OsdpEvent, OsdpFlag,
-    PdCapEntity, PdCapability, PdId, PdInfo, PeripheralDevice,
+    ControlPanel, OsdpCommand, OsdpEvent, PdCapEntity, PdCapability, PdInfoBuilder,
+    PeripheralDevice,
 };
 type Result<T> = core::result::Result<T, libosdp::OsdpError>;
 
@@ -21,18 +21,18 @@ pub struct CpDevice {
 
 impl CpDevice {
     pub fn new(bus: Box<dyn libosdp::Channel>) -> Result<Self> {
-        let pd_info = vec![PdInfo::for_cp(
-            "PD 101",
-            101,
-            115200,
-            OsdpFlag::empty(),
-            bus,
-            [
-                0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
-                0x0e, 0x0f,
-            ],
-        )];
-        let mut cp = ControlPanel::new(pd_info)?;
+        let pd_0_key = [
+            0x94, 0x4b, 0x8e, 0xdd, 0xcb, 0xaa, 0x2b, 0x5f,
+            0xe2, 0xb0, 0x14, 0x8d, 0x1b, 0x2f, 0x95, 0xc9
+        ];
+        let pd_0 = PdInfoBuilder::new()
+            .name("PD 101")?
+            .address(101)?
+            .baud_rate(115200)?
+            .channel(bus)
+            .secure_channel_key(pd_0_key)
+            .build();
+        let mut cp = ControlPanel::new(vec![pd_0])?;
         let (event_tx, event_rx) = std::sync::mpsc::channel::<(i32, OsdpEvent)>();
 
         cp.set_event_callback(|pd, event| {
@@ -74,23 +74,20 @@ pub struct PdDevice {
 
 impl PdDevice {
     pub fn new(bus: Box<dyn libosdp::Channel>) -> Result<Self> {
-        let pd_info = PdInfo::for_pd(
-            "PD 101",
-            101,
-            115200,
-            OsdpFlag::empty(),
-            PdId::from_number(101),
-            vec![
-                PdCapability::CommunicationSecurity(PdCapEntity::new(1, 1)),
-                PdCapability::AudibleOutput(PdCapEntity::new(1, 1)),
-                PdCapability::LedControl(PdCapEntity::new(1, 1)),
-            ],
-            bus,
-            [
-                0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
-                0x0e, 0x0f,
-            ],
-        );
+        let key = [
+            0x94, 0x4b, 0x8e, 0xdd, 0xcb, 0xaa, 0x2b, 0x5f,
+            0xe2, 0xb0, 0x14, 0x8d, 0x1b, 0x2f, 0x95, 0xc9
+        ];
+        let pd_info = PdInfoBuilder::new()
+            .name("PD 101")?
+            .address(101)?
+            .baud_rate(115200)?
+            .capability(PdCapability::CommunicationSecurity(PdCapEntity::new(1, 1)))
+            .capability(PdCapability::AudibleOutput(PdCapEntity::new(1, 1)))
+            .capability(PdCapability::LedControl(PdCapEntity::new(1, 1)))
+            .channel(bus)
+            .secure_channel_key(key)
+            .build();
         let mut pd = PeripheralDevice::new(pd_info)?;
         let (cmd_tx, cmd_rx) = std::sync::mpsc::channel::<OsdpCommand>();
         pd.set_command_callback(|command| {

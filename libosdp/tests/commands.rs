@@ -6,10 +6,13 @@
 use std::{sync::MutexGuard, thread, time};
 
 use libosdp::{
-    ControlPanel, OsdpCommand, OsdpCommandBuzzer, OsdpEvent, OsdpEventCardRead, PeripheralDevice, Channel,
+    Channel, ControlPanel, OsdpCommand, OsdpCommandBuzzer, OsdpEvent, OsdpEventCardRead,
+    PeripheralDevice,
 };
 
-use crate::common::{device::CpDevice, device::PdDevice, threadbus::ThreadBus, memory_channel::MemoryChannel};
+use crate::common::{
+    device::CpDevice, device::PdDevice, memory_channel::MemoryChannel, threadbus::ThreadBus,
+};
 
 mod common;
 

@@ -12,12 +12,12 @@
 //! happens on the PD itself (such as card read, key press, etc.,) snd sends it
 //! to the CP.
 
-use crate::{PdCapability, PdInfo};
 #[cfg(feature = "std")]
 use crate::{
     file::{impl_osdp_file_ops_for, OsdpFile, OsdpFileOps},
     OsdpCommand, OsdpError, OsdpEvent,
 };
+use crate::{PdCapability, PdInfo};
 use core::ffi::c_void;
 use log::{debug, error, info, warn};
 

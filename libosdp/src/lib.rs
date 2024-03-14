@@ -130,6 +130,10 @@ pub enum OsdpError {
     #[cfg_attr(feature = "std", error("Channel error: {0}"))]
     Channel(&'static str),
 
+    /// String conversion error
+    #[cfg_attr(feature = "std", error("PD info build error: {0}"))]
+    PdInfoBuilder(&'static str),
+
     /// IO Error
     #[cfg(feature = "std")]
     #[error("IO Error")]
@@ -169,7 +173,7 @@ pub trait ConvertEndian {
 
 bitflags::bitflags! {
     /// OSDP setup flags
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+    #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
     pub struct OsdpFlag: u32 {
         /// Make security conscious assumptions where possible. Fail where these
         /// assumptions don't hold. The following restrictions are enforced in

@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use libosdp::{
-    Channel, ChannelError, OsdpError, OsdpFlag, PdCapEntity, PdCapability, PdId, PdInfo,
+    Channel, ChannelError, OsdpError, OsdpFlag, PdCapEntity, PdCapability, PdInfoBuilder,
 };
 use std::{thread, time::Duration};
 
@@ -48,19 +48,19 @@ fn main() -> Result<(), OsdpError> {
         .init();
     let args: Vec<String> = std::env::args().collect();
     let channel = OsdpChannel::new(&args[1]);
-    let pd_info = PdInfo::for_pd(
-        "PD 101",
-        101,
-        115200,
-        OsdpFlag::EnforceSecure,
-        PdId::from_number(101),
-        vec![PdCapability::CommunicationSecurity(PdCapEntity::new(1, 1))],
-        Box::new(channel),
-        [
-            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
-            0x0e, 0x0f,
-        ],
-    );
+    let key = [
+        0x94, 0x4b, 0x8e, 0xdd, 0xcb, 0xaa, 0x2b, 0x5f,
+        0xe2, 0xb0, 0x14, 0x8d, 0x1b, 0x2f, 0x95, 0xc9
+    ];
+    let pd_info = PdInfoBuilder::new()
+        .name("PD 101")?
+        .address(101)?
+        .baud_rate(115200)?
+        .flag(OsdpFlag::EnforceSecure)
+        .capability(PdCapability::CommunicationSecurity(PdCapEntity::new(1, 1)))
+        .channel(Box::new(channel))
+        .secure_channel_key(key)
+        .build();
     let mut pd = libosdp::PeripheralDevice::new(pd_info)?;
     pd.set_command_callback(|_| {
         println!("Received command!");

@@ -3,9 +3,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-use libosdp::{
-    OsdpError, OsdpFlag, PdInfo, Channel, ChannelError,
-};
+use libosdp::{Channel, ChannelError, OsdpError, OsdpFlag, PdInfoBuilder};
 use std::{env, thread, time::Duration};
 
 struct OsdpChannel;
@@ -48,18 +46,19 @@ fn main() -> Result<(), OsdpError> {
         .init();
     let args: Vec<String> = env::args().collect();
     let channel = OsdpChannel::new(&args[1]);
-    let pd_info = vec![PdInfo::for_cp(
-        "PD 101",
-        101,
-        115200,
-        OsdpFlag::EnforceSecure,
-        Box::new(channel),
-        [
-            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
-            0x0e, 0x0f,
-        ],
-    )];
-    let mut cp = libosdp::ControlPanel::new(pd_info)?;
+    let pd_0_key = [
+        0x94, 0x4b, 0x8e, 0xdd, 0xcb, 0xaa, 0x2b, 0x5f,
+        0xe2, 0xb0, 0x14, 0x8d, 0x1b, 0x2f, 0x95, 0xc9
+    ];
+    let pd_0 = PdInfoBuilder::new()
+        .name("PD 101")?
+        .address(101)?
+        .baud_rate(115200)?
+        .flag(OsdpFlag::EnforceSecure)
+        .channel(Box::new(channel))
+        .secure_channel_key(pd_0_key)
+        .build();
+    let mut cp = libosdp::ControlPanel::new(vec![pd_0])?;
     loop {
         cp.refresh();
         thread::sleep(Duration::from_millis(50));
