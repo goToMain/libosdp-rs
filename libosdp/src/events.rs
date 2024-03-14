@@ -30,8 +30,8 @@ pub enum OsdpCardFormats {
     Ascii,
 }
 
-impl From<u32> for OsdpCardFormats {
-    fn from(value: u32) -> Self {
+impl From<libosdp_sys::osdp_event_cardread_format_e> for OsdpCardFormats {
+    fn from(value: libosdp_sys::osdp_event_cardread_format_e) -> Self {
         match value {
             libosdp_sys::osdp_event_cardread_format_e_OSDP_CARD_FMT_RAW_UNSPECIFIED => {
                 OsdpCardFormats::Unspecified
@@ -45,7 +45,7 @@ impl From<u32> for OsdpCardFormats {
     }
 }
 
-impl From<OsdpCardFormats> for u32 {
+impl From<OsdpCardFormats> for libosdp_sys::osdp_event_cardread_format_e {
     fn from(val: OsdpCardFormats) -> Self {
         match val {
             OsdpCardFormats::Unspecified => {
@@ -252,8 +252,8 @@ pub enum OsdpStatusReportType {
     Local,
 }
 
-impl From<u32> for OsdpStatusReportType {
-    fn from(value: u32) -> Self {
+impl From<libosdp_sys::osdp_status_report_type> for OsdpStatusReportType {
+    fn from(value: libosdp_sys::osdp_status_report_type) -> Self {
         match value {
             libosdp_sys::osdp_status_report_type_OSDP_STATUS_REPORT_INPUT => {
                 OsdpStatusReportType::Input
@@ -272,7 +272,7 @@ impl From<u32> for OsdpStatusReportType {
     }
 }
 
-impl From<OsdpStatusReportType> for u32 {
+impl From<OsdpStatusReportType> for libosdp_sys::osdp_status_report_type {
     fn from(value: OsdpStatusReportType) -> Self {
         match value {
             OsdpStatusReportType::Input => {

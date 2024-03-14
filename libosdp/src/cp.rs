@@ -22,7 +22,7 @@ unsafe extern "C" fn log_handler(
 ) {
     let msg = crate::cstr_to_string(msg);
     let msg = msg.trim();
-    match log_level as u32 {
+    match log_level as libosdp_sys::osdp_log_level_e {
         libosdp_sys::osdp_log_level_e_OSDP_LOG_EMERG => error!("CP: {msg}"),
         libosdp_sys::osdp_log_level_e_OSDP_LOG_ALERT => error!("CP: {msg}"),
         libosdp_sys::osdp_log_level_e_OSDP_LOG_CRIT => error!("CP: {msg}"),

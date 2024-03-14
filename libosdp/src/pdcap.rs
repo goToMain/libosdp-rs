@@ -195,7 +195,7 @@ impl FromStr for PdCapability {
 
 impl From<libosdp_sys::osdp_pd_cap> for PdCapability {
     fn from(value: libosdp_sys::osdp_pd_cap) -> Self {
-        let function_code = value.function_code as u32;
+        let function_code = value.function_code as libosdp_sys::osdp_pd_cap_function_code_e;
         let e = PdCapEntity {
             compliance: value.compliance_level,
             num_items: value.num_items,

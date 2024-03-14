@@ -40,7 +40,7 @@ pub enum OsdpLedColor {
 
 impl From<u8> for OsdpLedColor {
     fn from(value: u8) -> Self {
-        match value as u32 {
+        match value as libosdp_sys::osdp_led_color_e {
             libosdp_sys::osdp_led_color_e_OSDP_LED_COLOR_NONE => OsdpLedColor::None,
             libosdp_sys::osdp_led_color_e_OSDP_LED_COLOR_RED => OsdpLedColor::Red,
             libosdp_sys::osdp_led_color_e_OSDP_LED_COLOR_GREEN => OsdpLedColor::Green,

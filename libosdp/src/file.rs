@@ -7,9 +7,39 @@
 //! This module adds the required components to achieve this effect.
 
 use crate::OsdpError;
-use std::{ffi::c_void, fs::File, os::unix::prelude::FileExt, path::PathBuf};
+use std::{ffi::c_void, fs::File, path::PathBuf};
+
+#[cfg(not(target_os = "windows"))]
+use std::os::unix::prelude::FileExt;
+#[cfg(target_os = "windows")]
+use std::os::windows::fs::FileExt;
 
 type Result<T> = std::result::Result<T, OsdpError>;
+
+trait OffsetRead {
+    fn pread(&self, buf: &mut [u8], offset: u64) -> std::io::Result<usize>;
+    fn pwrite(&self, buf: &[u8], offset: u64) -> std::io::Result<usize>;
+}
+
+impl OffsetRead for std::fs::File {
+    #[inline(always)]
+    fn pread(&self, buf: &mut [u8], offset: u64) -> std::io::Result<usize> {
+        #[cfg(not(target_os = "windows"))]
+        return self.read_at(buf, offset);
+
+        #[cfg(target_os = "windows")]
+        return self.seek_read(buf, offset);
+    }
+
+    #[inline(always)]
+    fn pwrite(&self, buf: &[u8], offset: u64) -> std::io::Result<usize> {
+        #[cfg(not(target_os = "windows"))]
+        return self.write_at(buf, offset);
+
+        #[cfg(target_os = "windows")]
+        return self.seek_write(buf, offset);
+    }
+}
 
 /// OSDP file transfer context
 #[derive(Debug)]
@@ -49,7 +79,7 @@ unsafe extern "C" fn raw_file_read(
     }
     let file = ctx.file.as_ref().unwrap();
     let mut read_buf = vec![0u8; size as usize];
-    let len = match file.read_at(&mut read_buf, offset as u64) {
+    let len = match file.pread(&mut read_buf, offset as u64) {
         Ok(len) => len as i32,
         Err(_) => -1,
     };
@@ -70,7 +100,7 @@ unsafe extern "C" fn raw_file_write(
     let mut write_buf = vec![0u8; size as usize];
     std::ptr::copy_nonoverlapping(buf as *mut u8, write_buf.as_mut_ptr(), size as usize);
     let file = ctx.file.as_ref().unwrap();
-    match file.write_at(&write_buf, offset as u64) {
+    match file.pwrite(&write_buf, offset as u64) {
         Ok(len) => len as i32,
         Err(_) => -1,
     }
