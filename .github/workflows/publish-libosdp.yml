@@ -8,6 +8,10 @@ name: Publish libosdp
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag'
+        required: true
   push:
     # Sequence of patterns matched against refs/tags
     tags:
@@ -16,7 +20,7 @@ on:
 
 jobs:
   cross_platform_check:
-    name: Build libosdp on ${{ matrix.os }}
+    name: Build crate on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -30,7 +34,17 @@ jobs:
       with:
         toolchain: stable
         override: true
-    - run: cargo build -p libosdp-sys
+    - name: "Setup environment - trigger"
+      if: github.ref == 'refs/heads/master'
+      run: echo "TAG=${TRIGGER_TAG}" >> "${GITHUB_ENV}"
+      env:
+        TRIGGER_TAG: ${{ github.event.inputs.tag }}
+    - name: "Setup environment - tag"
+      if: github.ref != 'refs/heads/master'
+      run: echo "TAG=${REL_TAG}" >> "${GITHUB_ENV}"
+      env:
+        REL_TAG: ${{ github.ref_name }}
+    - run: cargo build -p $(echo ${TAG} | perl -pe 's/([a-z\-]+)-v.*/\1/')
 
   publish:
     name: Publish Crate

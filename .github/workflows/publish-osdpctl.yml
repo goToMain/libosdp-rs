@@ -19,7 +19,7 @@ on:
 
 jobs:
   publish:
-    name: Publish Crate
+    name: Publish Crate - osdpctl
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
