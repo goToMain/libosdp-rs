@@ -16,7 +16,7 @@ on:
 
 jobs:
   cross_platform_check:
-    name: Build libosdp-sys on ${{ matrix.os }}
+    name: Build libosdp on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -33,8 +33,8 @@ jobs:
     - run: cargo build -p libosdp-sys
 
   publish:
+    name: Publish Crate
     needs: [cross_platform_check]
-    name: Publish libosdp-sys
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -44,7 +44,18 @@ jobs:
       with:
         toolchain: stable
         override: true
-    - run: cargo publish --token ${CRATES_TOKEN} -p libosdp-sys
+    - name: "Setup environment - trigger"
+      if: github.ref == 'refs/heads/master'
+      run: echo "TAG=${TRIGGER_TAG}" >> "${GITHUB_ENV}"
+      env:
+        TRIGGER_TAG: ${{ github.event.inputs.tag }}
+    - name: "Setup environment - tag"
+      if: github.ref != 'refs/heads/master'
+      run: echo "TAG=${REL_TAG}" >> "${GITHUB_ENV}"
+      env:
+        REL_TAG: ${{ github.ref_name }}
+    - name: "Publish crate"
+      run: |
+        cargo publish --token ${CRATES_TOKEN} -p $(echo ${TAG} | perl -pe 's/([a-z\-]+)-v.*/\1/')
       env:
         CRATES_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        REL_TAG: ${{ github.ref_name }}
