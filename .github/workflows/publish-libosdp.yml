@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-name: Publish libosdp-sys
+name: Publish libosdp
 
 on:
   workflow_dispatch:
@@ -12,6 +12,7 @@ on:
     # Sequence of patterns matched against refs/tags
     tags:
     - 'libosdp-sys-v*'
+    - 'libosdp-v*'
 
 jobs:
   cross_platform_check:
