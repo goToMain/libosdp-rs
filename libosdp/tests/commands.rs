@@ -3,6 +3,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+mod common;
+type Result<T> = core::result::Result<T, libosdp::OsdpError>;
+
 use std::{sync::MutexGuard, thread, time};
 
 use libosdp::{
@@ -13,10 +16,6 @@ use libosdp::{
 use crate::common::{
     device::CpDevice, device::PdDevice, memory_channel::MemoryChannel, threadbus::ThreadBus,
 };
-
-mod common;
-
-type Result<T> = core::result::Result<T, libosdp::OsdpError>;
 
 fn send_command(mut cp: MutexGuard<'_, ControlPanel>, command: OsdpCommand) -> Result<()> {
     cp.send_command(0, command)
@@ -64,8 +63,8 @@ fn test_commands() -> Result<()> {
     notify_event(pd.get_device(), event.clone())?;
     assert_eq!(
         cp.receiver.recv().unwrap(),
-        (0 as i32, event),
-        "Cardread event check failed"
+        (0_i32, event),
+        "Card read event check failed"
     );
 
     Ok(())

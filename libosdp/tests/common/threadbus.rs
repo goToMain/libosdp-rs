@@ -4,7 +4,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use multiqueue::{BroadcastReceiver, BroadcastSender};
-use std::{fmt::Debug, io::Error, io::ErrorKind, sync::Mutex};
+use std::{
+    collections::hash_map::DefaultHasher,
+    fmt::Debug,
+    hash::{Hash, Hasher},
+    io::Error,
+    io::ErrorKind,
+    sync::Mutex,
+};
 
 pub struct ThreadBus {
     name: String,
@@ -13,12 +20,20 @@ pub struct ThreadBus {
     recv: Mutex<BroadcastReceiver<Vec<u8>>>,
 }
 
+fn str_to_channel_id(key: &str) -> i32 {
+    let mut hasher = DefaultHasher::new();
+    key.hash(&mut hasher);
+    let mut id: u64 = hasher.finish();
+    id = (id >> 32) ^ id & 0xffffffff;
+    id as i32
+}
+
 impl ThreadBus {
     pub fn new(name: &str) -> Self {
         let (send, recv) = multiqueue::broadcast_queue(4);
         Self {
             name: name.into(),
-            id: super::str_to_channel_id(name),
+            id: str_to_channel_id(name),
             send: Mutex::new(send),
             recv: Mutex::new(recv),
         }
