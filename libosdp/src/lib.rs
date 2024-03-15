@@ -67,8 +67,7 @@ mod channel;
 mod commands;
 mod cp;
 mod events;
-pub mod file;
-#[cfg(feature = "std")]
+mod file;
 mod pd;
 mod pdcap;
 mod pdid;
@@ -78,6 +77,7 @@ mod pdinfo;
 pub use channel::*;
 pub use commands::*;
 pub use events::*;
+pub use file::*;
 pub use pdcap::*;
 pub use pdid::*;
 pub use pdinfo::*;

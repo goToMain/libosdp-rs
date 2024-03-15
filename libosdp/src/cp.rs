@@ -7,8 +7,9 @@
 //! (PD) on the OSDP bus. It can send commands to and receive events from PDs.
 
 #[cfg(feature = "std")]
-use crate::file::{impl_osdp_file_ops_for, OsdpFile, OsdpFileOps};
-use crate::{OsdpCommand, OsdpError, OsdpEvent, OsdpFlag, PdCapability, PdId, PdInfo};
+use crate::{
+    file::OsdpFileOps, OsdpCommand, OsdpError, OsdpEvent, OsdpFlag, PdCapability, PdId, PdInfo,
+};
 use core::ffi::c_void;
 use log::{debug, error, info, warn};
 
@@ -174,6 +175,45 @@ impl ControlPanel {
         let idx = pd % 8;
         buf[pos as usize] & (1 << idx) != 0
     }
+
+    /// Get status of the ongoing file transfer of a PD, identified by the
+    /// offset number (in PdInfo vector in [`ControlPanel::new`]). Returns
+    /// (size, offset) of the current file transfer operation.
+    pub fn file_transfer_status(&self, pd: i32) -> Result<(i32, i32)> {
+        let mut size: i32 = 0;
+        let mut offset: i32 = 0;
+        let rc = unsafe {
+            libosdp_sys::osdp_get_file_tx_status(
+                self.ctx,
+                pd,
+                &mut size as *mut i32,
+                &mut offset as *mut i32,
+            )
+        };
+        if rc < 0 {
+            Err(OsdpError::FileTransfer("Not not in progress"))
+        } else {
+            Ok((size, offset))
+        }
+    }
+
+    /// Register a file operations handler for a PD. See [`crate::OsdpFileOps`]
+    /// trait documentation for more details.
+    pub fn register_file_ops(&mut self, pd: i32, fops: Box<dyn OsdpFileOps>) -> Result<()> {
+        let mut fops: libosdp_sys::osdp_file_ops = fops.into();
+        let rc = unsafe {
+            libosdp_sys::osdp_file_register_ops(
+                self.ctx,
+                pd,
+                &mut fops as *mut libosdp_sys::osdp_file_ops,
+            )
+        };
+        if rc < 0 {
+            Err(OsdpError::FileTransfer("ops register"))
+        } else {
+            Ok(())
+        }
+    }
 }
 
 impl Drop for ControlPanel {
@@ -181,6 +221,3 @@ impl Drop for ControlPanel {
         unsafe { libosdp_sys::osdp_cp_teardown(self.ctx) }
     }
 }
-
-#[cfg(feature = "std")]
-impl_osdp_file_ops_for!(ControlPanel);

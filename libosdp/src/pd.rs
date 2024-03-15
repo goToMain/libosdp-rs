@@ -12,12 +12,7 @@
 //! happens on the PD itself (such as card read, key press, etc.,) snd sends it
 //! to the CP.
 
-#[cfg(feature = "std")]
-use crate::{
-    file::{impl_osdp_file_ops_for, OsdpFile, OsdpFileOps},
-    OsdpCommand, OsdpError, OsdpEvent,
-};
-use crate::{PdCapability, PdInfo};
+use crate::{OsdpCommand, OsdpError, OsdpEvent, OsdpFileOps, PdCapability, PdInfo};
 use core::ffi::c_void;
 use log::{debug, error, info, warn};
 
@@ -147,11 +142,49 @@ impl PeripheralDevice {
     }
 
     /// Check secure channel status of a PD identified by the offset number
-    /// (in PdInfo vector in [`PeripheralDevice::new`]).
+    /// (in PdInfo vector in [`PeripheralDevice::new`]). Returns (size, offset)
+    /// of the current file transfer operation.
     pub fn is_sc_active(&self) -> bool {
         let mut buf: u8 = 0;
         unsafe { libosdp_sys::osdp_get_sc_status_mask(self.ctx, &mut buf as *mut u8) };
         buf != 0
+    }
+
+    /// Get status of the ongoing file transfer of PD
+    pub fn file_transfer_status(&self) -> Result<(i32, i32)> {
+        let mut size: i32 = 0;
+        let mut offset: i32 = 0;
+        let rc = unsafe {
+            libosdp_sys::osdp_get_file_tx_status(
+                self.ctx,
+                0,
+                &mut size as *mut i32,
+                &mut offset as *mut i32,
+            )
+        };
+        if rc < 0 {
+            Err(OsdpError::FileTransfer("Not not in progress"))
+        } else {
+            Ok((size, offset))
+        }
+    }
+
+    /// Register a file operations handler for PD. See [`crate::OsdpFileOps`]
+    /// trait documentation for more details.
+    pub fn register_file_ops(&mut self, fops: Box<dyn OsdpFileOps>) -> Result<()> {
+        let mut fops: libosdp_sys::osdp_file_ops = fops.into();
+        let rc = unsafe {
+            libosdp_sys::osdp_file_register_ops(
+                self.ctx,
+                0,
+                &mut fops as *mut libosdp_sys::osdp_file_ops,
+            )
+        };
+        if rc < 0 {
+            Err(OsdpError::FileTransfer("ops register"))
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -160,6 +193,3 @@ impl Drop for PeripheralDevice {
         unsafe { libosdp_sys::osdp_pd_teardown(self.ctx) }
     }
 }
-
-#[cfg(feature = "std")]
-impl_osdp_file_ops_for!(PeripheralDevice);
