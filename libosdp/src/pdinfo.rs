@@ -4,56 +4,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use alloc::ffi::CString;
-use core::ffi::c_void;
 
-use crate::{Channel, ChannelError, OsdpError, OsdpFlag, PdCapability, PdId};
-
-unsafe extern "C" fn raw_read(data: *mut c_void, buf: *mut u8, len: i32) -> i32 {
-    let channel: *mut Box<dyn Channel> = data as *mut _;
-    let channel = channel.as_mut().unwrap();
-    let mut read_buf = vec![0u8; len as usize];
-    match channel.read(&mut read_buf) {
-        Ok(n) => {
-            let src_ptr = read_buf.as_mut_ptr();
-            core::ptr::copy_nonoverlapping(src_ptr, buf, len as usize);
-            n as i32
-        }
-        Err(ChannelError::WouldBlock) => 0,
-        Err(_) => -1,
-    }
-}
-
-unsafe extern "C" fn raw_write(data: *mut c_void, buf: *mut u8, len: i32) -> i32 {
-    let channel: *mut Box<dyn Channel> = data as *mut _;
-    let channel = channel.as_mut().unwrap();
-    let mut write_buf = vec![0u8; len as usize];
-    core::ptr::copy_nonoverlapping(buf, write_buf.as_mut_ptr(), len as usize);
-    match channel.as_mut().write(&write_buf) {
-        Ok(n) => n as i32,
-        Err(ChannelError::WouldBlock) => 0,
-        Err(_) => -1,
-    }
-}
-
-unsafe extern "C" fn raw_flush(data: *mut c_void) {
-    let channel: *mut Box<dyn Channel> = data as *mut _;
-    let channel = channel.as_mut().unwrap();
-    let _ = channel.as_mut().flush();
-}
-
-impl From<Box<dyn Channel>> for libosdp_sys::osdp_channel {
-    fn from(val: Box<dyn Channel>) -> Self {
-        let id = val.get_id();
-        let data = Box::into_raw(Box::new(val));
-        libosdp_sys::osdp_channel {
-            id,
-            data: data as *mut c_void,
-            recv: Some(raw_read),
-            send: Some(raw_write),
-            flush: Some(raw_flush),
-        }
-    }
-}
+use crate::{Channel, OsdpError, OsdpFlag, PdCapability, PdId};
 
 /// OSDP PD Information. This struct is used to describe a PD to LibOSDP
 #[derive(Debug)]
