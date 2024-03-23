@@ -18,7 +18,16 @@ usage() {
 	---
 }
 
-function caro_inc_version() {
+function cargo_set_version() {
+	dir=$1
+	ver=$2
+	perl -pi -se '
+	if (/^version = "\d+\.\d+\.\d+"$/) {
+		$_="version = \"$ver\"\n"
+	}' -- -ver=$ver $dir/Cargo.toml
+}
+
+function cargo_inc_version() {
 	dir=$1
 	inc=$2
 	perl -pi -se '
@@ -31,19 +40,41 @@ function caro_inc_version() {
 	}' -- -$inc $dir/Cargo.toml
 }
 
-function do_cargo_release() {
+function commit_release() {
 	crate=$1
-	inc=$2
-	caro_inc_version $crate $inc
-	version=$(perl -ne 'print $1 if (/^version = "(.+)"$/)' $dir/Cargo.toml)
-	git add $dir/Cargo.toml &&
+	version=$(perl -ne 'print $1 if (/^version = "(.+)"$/)' $crate/Cargo.toml)
+	git add $crate/Cargo.toml &&
 	git commit -s -m "$crate: Release v$version" &&
 	git tag "$crate-v$version" -a -m "Release $version"
 }
 
+function do_cargo_release() {
+	crate=$1
+	inc=$2
+	cargo_inc_version $crate $inc
+	commit_release $crate
+}
+
+function do_libosdp_sys_bump() {
+	latest_release=$(curl -s https://api.github.com/repos/gotoMain/libosdp/releases/latest | jq -r .tag_name)
+	version=$(perl -ne 'print $1 if (/^version = "(.+)"$/)' libosdp-sys/Cargo.toml)
+	if [[ "${latest_release}" == "v${version}" ]]; then
+		echo "Nothing to be done"
+		return
+	fi
+	pushd libosdp-sys/vendor
+	git fetch origin
+	git checkout ${latest_release}
+	git submodule update --recursive
+	popd
+	git add libosdp-sys/vendor
+	cargo_set_version libosdp-sys ${latest_release#"v"}
+	commit_release libosdp-sys
+}
+
 function do_release() {
 	case $1 in
-	libosdp-sys) do_cargo_release "libosdp-sys" $2 ;;
+	libosdp-sys) do_libosdp_sys_bump ;;
 	libosdp) do_cargo_release "libosdp" $2 ;;
 	osdpctl) do_cargo_release "osdpctl" $2 ;;
 	esac
@@ -53,7 +84,7 @@ INC="patch"
 COMPONENT="libosdp"
 while [ $# -gt 0 ]; do
 	case $1 in
-	-c|--componenet)	COMPONENT=$2; shift;;
+	-c|--create)		CRATE=$2; shift;;
 	--patch)		INC="patch";;
 	--major)		INC="major";;
 	--minor)		INC="minor";;
@@ -63,5 +94,5 @@ while [ $# -gt 0 ]; do
 	shift
 done
 
-do_release $COMPONENT $INC
+do_release $CRATE $INC
 
