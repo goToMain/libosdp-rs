@@ -81,14 +81,24 @@ impl PdInfoBuilder {
     /// Set PD ID; Static information that the PD reports to the CP when it
     /// received a `CMD_ID`. For CP mode, this field is ignored, but PD mode
     /// must set
-    pub fn id(mut self, id: PdId) -> PdInfoBuilder {
-        self.id = id;
+    pub fn id(mut self, id: &PdId) -> PdInfoBuilder {
+        self.id = id.clone();
         self
     }
 
     /// Set a PD capability
     pub fn capability(mut self, cap: PdCapability) -> PdInfoBuilder {
         self.cap.push(cap.into());
+        self
+    }
+
+    /// Set multiple capabilities at once
+    pub fn capabilities<'a, I>(mut self, caps: I) -> PdInfoBuilder
+        where I: IntoIterator<Item=&'a PdCapability>,
+    {
+        for cap in caps {
+            self.cap.push(cap.clone().into());
+        }
         self
     }
 
