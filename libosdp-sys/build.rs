@@ -7,6 +7,17 @@ use std::{
 };
 type Result<T> = anyhow::Result<T, anyhow::Error>;
 
+const OSDP_EXPORT_CONTENT: &str = "/* Auto generated from build.rs */
+#ifndef OSDP_EXPORT_H_
+#define OSDP_EXPORT_H_
+
+#define OSDP_EXPORT
+#define OSDP_NO_EXPORT
+#define OSDP_DEPRECATED_EXPORT
+
+#endif /* OSDP_EXPORT_H_ */
+";
+
 fn path_join(root: &str, path: &str) -> String {
     Path::new(root)
         .join(path)
@@ -64,11 +75,11 @@ impl GitInfo {
 }
 
 fn generate_osdp_build_headers(out_dir: &str) -> Result<()> {
-    // Add an empty file as we don't
-    let data = "#define OSDP_EXPORT";
-    std::fs::write(path_join(out_dir, "osdp_export.h"), data)
+    /* generate osdp_export.h */
+    std::fs::write(path_join(out_dir, "osdp_export.h"), OSDP_EXPORT_CONTENT)
         .context("Failed to create osdp_export.h")?;
 
+    /* generate osdp_config.h */
     let git = GitInfo::new()?;
     let src = "vendor/src/osdp_config.h.in";
     let dest = path_join(out_dir, "osdp_config.h");
@@ -94,6 +105,8 @@ fn main() -> Result<()> {
     let out_dir = std::env::var("OUT_DIR").unwrap();
 
     generate_osdp_build_headers(&out_dir)?;
+
+    /* build LibOSDP */
 
     let mut build = cc::Build::new();
     let mut build = build
@@ -151,8 +164,14 @@ fn main() -> Result<()> {
 
     build.compile("libosdp.a");
 
+    /* generate bindings */
+
+    let args = vec![
+        format!("-I{}", &out_dir),
+    ];
     let bindings = bindgen::Builder::default()
         .header("vendor/include/osdp.h")
+        .clang_args(args)
         .generate()
         .context("Unable to generate bindings")?;
 
