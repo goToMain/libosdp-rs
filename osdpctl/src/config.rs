@@ -6,16 +6,16 @@
 use anyhow::bail;
 use anyhow::Context;
 use configparser::ini::Ini;
-use libosdp::{
-    channel::{OsdpChannel, UnixChannel},
-    OsdpFlag, PdCapability, PdId, PdInfo,
-};
+use libosdp::PdInfoBuilder;
+use libosdp::{OsdpFlag, PdCapability, PdId, PdInfo};
 use rand::Rng;
 use std::{
     fmt::Write,
     path::{Path, PathBuf},
     str::FromStr,
 };
+
+use crate::unix_channel::UnixChannel;
 
 type Result<T> = anyhow::Result<T, anyhow::Error>;
 
@@ -142,16 +142,17 @@ impl CpConfig {
                     bail!("Only unix channel is supported for now")
                 }
                 let path = runtime_dir.join(format!("{}/{}.sock", d.name, parts[1]).as_str());
-                let stream =
+                let channel =
                     UnixChannel::connect(&path).context("Unable to connect to PD channel")?;
-                Ok(PdInfo::for_cp(
-                    &self.name,
-                    d.address,
-                    9600,
-                    d.flags,
-                    OsdpChannel::new::<UnixChannel>(Box::new(stream)),
-                    d.key_store.load()?,
-                ))
+                let pd_info = PdInfoBuilder::new()
+                    .name(&self.name)?
+                    .address(d.address)?
+                    .baud_rate(115200)?
+                    .flag(d.flags)
+                    .channel(Box::new(channel))
+                    .secure_channel_key(d.key_store.load()?)
+                    .build();
+                Ok(pd_info)
             })
             .collect()
     }
@@ -239,17 +240,18 @@ impl PdConfig {
             bail!("Only unix channel is supported for now")
         }
         let path = self.runtime_dir.join(format!("{}.sock", parts[1]).as_str());
-        let stream = UnixChannel::new(&path)?;
-        Ok(PdInfo::for_pd(
-            &self.name,
-            self.address,
-            9600,
-            self.flags,
-            self.pd_id.clone(),
-            self.pd_cap.clone(),
-            OsdpChannel::new::<UnixChannel>(Box::new(stream)),
-            self.key_store.load()?,
-        ))
+        let channel = UnixChannel::new(&path)?;
+        let pd_info = PdInfoBuilder::new()
+            .name(&self.name)?
+            .address(self.address)?
+            .baud_rate(115200)?
+            .flag(self.flags)
+            .capabilities(&self.pd_cap)
+            .id(&self.pd_id)
+            .channel(Box::new(channel))
+            .secure_channel_key(self.key_store.load()?)
+            .build();
+        Ok(pd_info)
     }
 }
 

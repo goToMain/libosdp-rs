@@ -7,6 +7,7 @@ mod config;
 mod cp;
 mod daemonize;
 mod pd;
+mod unix_channel;
 
 use anyhow::{bail, Context};
 use clap::{arg, Command};
