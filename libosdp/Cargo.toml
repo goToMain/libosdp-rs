@@ -14,7 +14,7 @@ categories = ["development-tools", "embedded"]
 
 [dependencies]
 bitflags = "2.4.0"
-libosdp-sys = "3.0.3"
+libosdp-sys = "3.0.5"
 log = "0.4.20"
 once_cell = "1.18.0"
 serde = { version = "1.0.192", features = ["derive"] }
