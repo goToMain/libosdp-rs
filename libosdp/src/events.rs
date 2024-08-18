@@ -146,7 +146,7 @@ impl From<OsdpEventCardRead> for libosdp_sys::osdp_event_cardread {
         data[..value.data.len()].copy_from_slice(&value.data[..]);
         libosdp_sys::osdp_event_cardread {
             reader_no: value.reader_no,
-            format: value.format.clone().into(),
+            format: value.format.into(),
             direction: value.direction as i32,
             length,
             data,
@@ -389,7 +389,7 @@ impl From<OsdpEvent> for libosdp_sys::osdp_event {
             OsdpEvent::Status(e) => libosdp_sys::osdp_event {
                 type_: libosdp_sys::osdp_event_type_OSDP_EVENT_STATUS,
                 __bindgen_anon_1: libosdp_sys::osdp_event__bindgen_ty_1 {
-                    status: e.clone().into(),
+                    status: e.into(),
                 },
             },
         }
