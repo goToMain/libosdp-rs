@@ -30,3 +30,11 @@ sha256 = "1.5.0"
 [features]
 default = ["std"]
 std = ["thiserror"]
+
+[[example]]
+name = "cp"
+required-features = ["std"]
+
+[[example]]
+name = "pd"
+required-features = ["std"]
