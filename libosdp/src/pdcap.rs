@@ -8,7 +8,7 @@ use core::str::FromStr;
 use crate::OsdpError;
 
 /// PD capability entity to be used inside [`PdCapability`]
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct PdCapEntity {
     compliance: u8,
     num_items: u8,
@@ -68,7 +68,7 @@ impl FromStr for PdCapEntity {
 
 /// OSDP defined PD capabilities. PDs expose/advertise features they support to
 /// the CP by means of "capabilities".
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum PdCapability {
     /// This function indicates the ability to monitor the status of a switch
     /// using a two-wire electrical connection between the PD and the switch.

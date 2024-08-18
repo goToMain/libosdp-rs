@@ -17,7 +17,7 @@ type Result<T> = core::result::Result<T, OsdpError>;
 
 /// Various card formats that a PD can support. This is sent to CP when a PD
 /// must report a card read
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum OsdpCardFormats {
     /// Card format is not specified
     Unspecified,
@@ -60,7 +60,7 @@ impl From<OsdpCardFormats> for libosdp_sys::osdp_event_cardread_format_e {
 }
 
 /// Event that describes card read activity on the PD
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct OsdpEventCardRead {
     /// Reader (another device connected to this PD) which caused this event
     ///
@@ -146,7 +146,7 @@ impl From<OsdpEventCardRead> for libosdp_sys::osdp_event_cardread {
         data[..value.data.len()].copy_from_slice(&value.data[..]);
         libosdp_sys::osdp_event_cardread {
             reader_no: value.reader_no,
-            format: value.format.clone().into(),
+            format: value.format.into(),
             direction: value.direction as i32,
             length,
             data,
@@ -200,7 +200,7 @@ impl From<OsdpEventKeyPress> for libosdp_sys::osdp_event_keypress {
 }
 
 /// Event to transport a Manufacturer specific command's response.
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct OsdpEventMfgReply {
     /// 3-byte IEEE assigned OUI used as vendor code
     pub vendor_code: (u8, u8, u8),
@@ -239,8 +239,8 @@ impl From<OsdpEventMfgReply> for libosdp_sys::osdp_event_mfgrep {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 /// Status report type
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum OsdpStatusReportType {
     /// Input status report
     Input,
@@ -299,7 +299,7 @@ impl From<OsdpStatusReportType> for libosdp_sys::osdp_status_report_type {
 /// number of items as described in the corresponding capability codes,
 /// - PdCapability::OutputControl
 /// - PdCapability::ContactStatusMonitoring
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct OsdpStatusReport {
     type_: OsdpStatusReportType,
     nr_entries: usize,
@@ -389,7 +389,7 @@ impl From<OsdpEvent> for libosdp_sys::osdp_event {
             OsdpEvent::Status(e) => libosdp_sys::osdp_event {
                 type_: libosdp_sys::osdp_event_type_OSDP_EVENT_STATUS,
                 __bindgen_anon_1: libosdp_sys::osdp_event__bindgen_ty_1 {
-                    status: e.clone().into(),
+                    status: e.into(),
                 },
             },
         }

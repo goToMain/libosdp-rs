@@ -8,7 +8,7 @@ use alloc::ffi::CString;
 use crate::{Channel, OsdpError, OsdpFlag, PdCapability, PdId};
 
 /// OSDP PD Information. This struct is used to describe a PD to LibOSDP
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct PdInfo {
     name: CString,
     address: i32,
@@ -82,7 +82,7 @@ impl PdInfoBuilder {
     /// received a `CMD_ID`. For CP mode, this field is ignored, but PD mode
     /// must set
     pub fn id(mut self, id: &PdId) -> PdInfoBuilder {
-        self.id = id.clone();
+        self.id = *id;
         self
     }
 
@@ -147,7 +147,7 @@ impl PdInfo {
             baud_rate: self.baud_rate,
             address: self.address,
             flags: self.flags.bits() as i32,
-            id: self.id.clone().into(),
+            id: self.id.into(),
             cap: self.cap.as_ptr(),
             channel: self.channel.take().unwrap().into(),
             scbk,
