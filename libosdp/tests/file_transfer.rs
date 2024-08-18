@@ -36,10 +36,7 @@ pub struct OsdpFileManager {
 
 impl OsdpFileManager {
     pub fn new() -> Self {
-        Self {
-            files: HashMap::new(),
-            file: None,
-        }
+        Self::default()
     }
 
     pub fn register_file(&mut self, id: i32, path: &str) {
