@@ -95,7 +95,7 @@ pub use cp::ControlPanel;
 pub use pd::PeripheralDevice;
 
 /// OSDP public errors
-#[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[derive(Debug, Default)]
 #[cfg_attr(feature = "std", derive(Error))]
 pub enum OsdpError {
     /// PD info error
