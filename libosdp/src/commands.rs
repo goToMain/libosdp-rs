@@ -545,9 +545,7 @@ impl From<OsdpCommand> for libosdp_sys::osdp_cmd {
             },
             OsdpCommand::Buzzer(c) => libosdp_sys::osdp_cmd {
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_BUZZER,
-                __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 {
-                    buzzer: c.into(),
-                },
+                __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 { buzzer: c.into() },
             },
             OsdpCommand::Text(c) => libosdp_sys::osdp_cmd {
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_TEXT,
@@ -557,15 +555,11 @@ impl From<OsdpCommand> for libosdp_sys::osdp_cmd {
             },
             OsdpCommand::Output(c) => libosdp_sys::osdp_cmd {
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_OUTPUT,
-                __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 {
-                    output: c.into(),
-                },
+                __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 { output: c.into() },
             },
             OsdpCommand::ComSet(c) => libosdp_sys::osdp_cmd {
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_COMSET,
-                __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 {
-                    comset: c.into(),
-                },
+                __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 { comset: c.into() },
             },
             OsdpCommand::KeySet(c) => libosdp_sys::osdp_cmd {
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_KEYSET,
@@ -581,15 +575,11 @@ impl From<OsdpCommand> for libosdp_sys::osdp_cmd {
             },
             OsdpCommand::FileTx(c) => libosdp_sys::osdp_cmd {
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_FILE_TX,
-                __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 {
-                    file_tx: c.into(),
-                },
+                __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 { file_tx: c.into() },
             },
             OsdpCommand::Status(c) => libosdp_sys::osdp_cmd {
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_STATUS,
-                __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 {
-                    status: c.into(),
-                },
+                __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 { status: c.into() },
             },
         }
     }

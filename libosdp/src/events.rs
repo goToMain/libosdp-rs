@@ -388,9 +388,7 @@ impl From<OsdpEvent> for libosdp_sys::osdp_event {
             },
             OsdpEvent::Status(e) => libosdp_sys::osdp_event {
                 type_: libosdp_sys::osdp_event_type_OSDP_EVENT_STATUS,
-                __bindgen_anon_1: libosdp_sys::osdp_event__bindgen_ty_1 {
-                    status: e.into(),
-                },
+                __bindgen_anon_1: libosdp_sys::osdp_event__bindgen_ty_1 { status: e.into() },
             },
         }
     }
