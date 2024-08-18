@@ -35,6 +35,10 @@ jobs:
       run: echo "TAG=${REL_TAG}" >> "${GITHUB_ENV}"
       env:
         REL_TAG: ${{ github.ref_name }}
+    - name: Check semver
+      uses: obi1kenobi/cargo-semver-checks-action@v2
+      with:
+        package: osdpctl
     - name: "Publish crate"
       run: |
         cargo publish --token ${CRATES_TOKEN} -p osdpctl
