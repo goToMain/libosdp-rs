@@ -19,7 +19,7 @@
 use core::ffi::c_void;
 
 /// OSDP channel errors
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum ChannelError {
     /// Channel is temporarily unavailable (could have blocked until it was
     /// ready but LibOSDP required channel to be non-blocking so return "I would

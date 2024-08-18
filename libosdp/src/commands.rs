@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 use super::ConvertEndian;
 
 /// LED Colors as specified in OSDP for the on_color/off_color parameters.
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum OsdpLedColor {
     /// No Color
     #[default]
@@ -68,7 +68,7 @@ impl From<OsdpLedColor> for u8 {
 }
 
 /// LED params sub-structure. Part of LED command: OsdpCommandLed
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct OsdpLedParams {
     /// Control code serves different purposes based on which member of
     /// [`OsdpCommandLed`] it is used with. They are,
@@ -128,7 +128,7 @@ impl From<OsdpLedParams> for libosdp_sys::osdp_cmd_led_params {
 }
 
 /// Command to control the behavior of it's on-board LEDs
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct OsdpCommandLed {
     /// Reader (another device connected to this PD) for which this command is
     /// issued for.
@@ -174,7 +174,7 @@ impl From<OsdpCommandLed> for libosdp_sys::osdp_cmd_led {
 }
 
 /// Command to control the behavior of a buzzer in the PD
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct OsdpCommandBuzzer {
     /// Reader (another device connected to this PD) for which this command is
     /// issued for.
@@ -230,7 +230,7 @@ impl From<OsdpCommandBuzzer> for libosdp_sys::osdp_cmd_buzzer {
 
 /// Command to manipulate the on-board display unit (Can be LED, LCD, 7-Segment,
 /// etc.,) on the PD.
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct OsdpCommandText {
     /// Reader (another device connected to this PD) for which this command is
     /// issued for.
@@ -294,7 +294,7 @@ impl From<OsdpCommandText> for libosdp_sys::osdp_cmd_text {
 }
 
 /// Command to control digital output exposed by the PD.
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct OsdpCommandOutput {
     /// The output number this to apply this action.
     ///
@@ -341,7 +341,7 @@ impl From<OsdpCommandOutput> for libosdp_sys::osdp_cmd_output {
 /// Command to set the communication parameters for the PD. The effects of this
 /// command is expected to be be stored in PD's non-volatile memory as the CP
 /// will expect the PD to be in this state moving forward.
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct OsdpComSet {
     address: u8,
     baud_rate: u32,
@@ -379,7 +379,7 @@ impl From<OsdpComSet> for libosdp_sys::osdp_cmd_comset {
 }
 
 /// Command to set secure channel keys to the PD.
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct OsdpCommandKeyset {
     key_type: u8,
     /// Key data
@@ -422,7 +422,7 @@ impl From<OsdpCommandKeyset> for libosdp_sys::osdp_cmd_keyset {
 }
 
 /// Command to to act as a wrapper for manufacturer specific commands
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct OsdpCommandMfg {
     /// 3-byte IEEE assigned OUI used as vendor code
     pub vendor_code: (u8, u8, u8),
@@ -462,7 +462,7 @@ impl From<OsdpCommandMfg> for libosdp_sys::osdp_cmd_mfg {
 }
 
 /// Command to kick-off a file transfer to the PD.
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct OsdpCommandFileTx {
     id: i32,
     flags: u32,
@@ -501,7 +501,7 @@ impl From<OsdpCommandFileTx> for libosdp_sys::osdp_cmd_file_tx {
 
 /// CP interacts with and controls PDs by sending commands to it. The commands
 /// in this enum are specified by OSDP specification.
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum OsdpCommand {
     /// Command to control the behavior of it’s on-board LEDs
     Led(OsdpCommandLed),

@@ -28,7 +28,7 @@ use std::os::unix::prelude::FileExt;
 use std::os::windows::fs::FileExt;
 
 /// OSDP file transfer context
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct OsdpFileManager {
     files: HashMap<i32, PathBuf>,
     file: Option<File>,

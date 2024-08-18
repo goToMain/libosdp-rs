@@ -8,7 +8,7 @@ use alloc::ffi::CString;
 use crate::{Channel, OsdpError, OsdpFlag, PdCapability, PdId};
 
 /// OSDP PD Information. This struct is used to describe a PD to LibOSDP
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct PdInfo {
     name: CString,
     address: i32,

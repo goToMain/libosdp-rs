@@ -24,6 +24,7 @@ fn vec_to_array<T, const N: usize>(v: Vec<T>) -> [T; N] {
         .unwrap_or_else(|v: Vec<T>| panic!("Expected a Vec of length {} but it was {}", N, v.len()))
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct KeyStore {
     store: PathBuf,
 }
@@ -82,6 +83,7 @@ impl KeyStore {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PdData {
     pub name: String,
     channel: String,
@@ -90,6 +92,7 @@ pub struct PdData {
     flags: OsdpFlag,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct CpConfig {
     pub runtime_dir: PathBuf,
     pub name: String,
@@ -158,6 +161,7 @@ impl CpConfig {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PdConfig {
     pub runtime_dir: PathBuf,
     pub name: String,
@@ -255,6 +259,8 @@ impl PdConfig {
     }
 }
 
+/// Configuration for the
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DeviceConfig {
     CpConfig(CpConfig),
     PdConfig(PdConfig),

@@ -6,7 +6,7 @@
 use super::ConvertEndian;
 
 /// PD ID information advertised by the PD.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct PdId {
     /// 1-Byte Manufacturer's version number
     pub version: i32,
