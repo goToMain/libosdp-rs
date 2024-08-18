@@ -259,7 +259,6 @@ impl PdConfig {
     }
 }
 
-/// Configuration for the
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DeviceConfig {
     CpConfig(CpConfig),
