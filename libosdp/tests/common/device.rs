@@ -16,6 +16,7 @@ type Result<T> = core::result::Result<T, libosdp::OsdpError>;
 
 pub struct CpDevice {
     dev: Arc<Mutex<ControlPanel>>,
+    #[allow(unused)] // false positive, it is used!
     pub receiver: Receiver<(i32, OsdpEvent)>,
 }
 

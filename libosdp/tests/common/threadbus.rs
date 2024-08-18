@@ -20,6 +20,7 @@ pub struct ThreadBus {
     recv: Mutex<BroadcastReceiver<Vec<u8>>>,
 }
 
+#[allow(unused)] // false positive, it is used!
 fn str_to_channel_id(key: &str) -> i32 {
     let mut hasher = DefaultHasher::new();
     key.hash(&mut hasher);
@@ -29,6 +30,7 @@ fn str_to_channel_id(key: &str) -> i32 {
 }
 
 impl ThreadBus {
+    #[allow(unused)] // false positive, it is used!
     pub fn new(name: &str) -> Self {
         let (send, recv) = multiqueue::broadcast_queue(4);
         Self {
