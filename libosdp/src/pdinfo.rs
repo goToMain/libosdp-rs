@@ -5,7 +5,7 @@
 
 use alloc::ffi::CString;
 
-use crate::{Channel, OsdpError, OsdpFlag, PdCapability, PdId};
+use crate::{format, Box, Channel, OsdpError, OsdpFlag, PdCapability, PdId, String, Vec};
 
 /// OSDP PD Information. This struct is used to describe a PD to LibOSDP
 #[derive(Debug, Default)]
@@ -254,7 +254,7 @@ impl PdInfo {
         if let Some(key) = self.scbk.as_mut() {
             scbk = key.as_mut_ptr();
         } else {
-            scbk = std::ptr::null_mut::<u8>();
+            scbk = core::ptr::null_mut::<u8>();
         }
         libosdp_sys::osdp_pd_info_t {
             name: self.name.as_ptr(),

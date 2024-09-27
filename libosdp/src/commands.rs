@@ -7,7 +7,7 @@
 //! are specified by OSDP specification. This module is responsible to handling
 //! such commands though [`OsdpCommand`].
 
-use crate::OsdpStatusReport;
+use crate::{OsdpStatusReport, Vec};
 use serde::{Deserialize, Serialize};
 
 use super::ConvertEndian;
