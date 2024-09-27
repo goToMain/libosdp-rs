@@ -14,11 +14,13 @@ categories = ["development-tools", "embedded"]
 
 [build-dependencies]
 anyhow = "1.0.75"
-bindgen = "0.69.1"
+bindgen = "0.70.0"
 build-target = "0.4.0"
 cc = "1.0.83"
 
 [features]
+default = ["std"]
+std = []
 packet_trace = []
 data_trace = []
 skip_mark_byte = []
