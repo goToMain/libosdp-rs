@@ -6,9 +6,9 @@
 //! The Control Panel (CP) is responsible to connecting to and managing multiple Peripheral Devices
 //! (PD) on the OSDP bus. It can send commands to and receive events from PDs.
 
-#[cfg(feature = "std")]
 use crate::{
-    file::OsdpFileOps, OsdpCommand, OsdpError, OsdpEvent, OsdpFlag, PdCapability, PdId, PdInfo,
+    file::OsdpFileOps, Box, OsdpCommand, OsdpError, OsdpEvent, OsdpFlag, PdCapability, PdId,
+    PdInfo, Vec,
 };
 use core::ffi::c_void;
 use log::{debug, error, info, warn};

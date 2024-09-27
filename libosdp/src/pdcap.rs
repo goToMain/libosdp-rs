@@ -5,7 +5,7 @@
 
 use core::str::FromStr;
 
-use crate::OsdpError;
+use crate::{format, OsdpError};
 
 /// PD capability entity to be used inside [`PdCapability`]
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
