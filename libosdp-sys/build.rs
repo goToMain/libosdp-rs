@@ -166,10 +166,9 @@ fn main() -> Result<()> {
 
     /* generate bindings */
 
-    let args = vec![
-        format!("-I{}", &out_dir),
-    ];
+    let args = vec![format!("-I{}", &out_dir)];
     let bindings = bindgen::Builder::default()
+        .use_core()
         .header("vendor/include/osdp.h")
         .clang_args(args)
         .generate()
