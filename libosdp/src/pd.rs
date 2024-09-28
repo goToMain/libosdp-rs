@@ -12,7 +12,10 @@
 //! happens on the PD itself (such as card read, key press, etc.,) snd sends it
 //! to the CP.
 
-use crate::{Box, OsdpCommand, OsdpError, OsdpEvent, OsdpFileOps, PdCapability, PdInfo, Vec};
+use crate::{
+    Box, Channel, OsdpCommand, OsdpError, OsdpEvent, OsdpFileOps, PdCapability, PdInfo,
+    PdInfoBuilder, Vec,
+};
 use core::ffi::c_void;
 use log::{debug, error, info, warn};
 
@@ -75,10 +78,10 @@ pub struct PeripheralDevice {
 unsafe impl Send for PeripheralDevice {}
 
 impl PeripheralDevice {
-    /// Create a new Peripheral panel object for the list of PDs described by the
-    /// corresponding PdInfo struct.
-    pub fn new(info: PdInfo) -> Result<Self> {
+    /// Create a new Peripheral panel object for the PD described by the corresponding PdInfo struct.
+    pub fn new(info: PdInfoBuilder, channel: Box<dyn Channel>) -> Result<Self> {
         unsafe { libosdp_sys::osdp_set_log_callback(Some(log_handler)) };
+        let info = info.channel(channel.into()).build();
         Ok(Self {
             ctx: pd_setup(info)?,
         })
