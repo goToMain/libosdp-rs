@@ -3,9 +3,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-use core::ops::Deref;
+use crate::{OsdpError, OsdpFlag, PdCapability, PdId};
 use alloc::{boxed::Box, ffi::CString, format, string::String, vec::Vec};
-use crate::{Channel, OsdpError, OsdpFlag, PdCapability, PdId};
+use core::ops::Deref;
 
 /// OSDP PD Information. This struct is used to describe a PD to LibOSDP
 #[derive(Debug, Default)]
@@ -16,7 +16,7 @@ pub struct PdInfo {
     flags: OsdpFlag,
     id: PdId,
     cap: Vec<libosdp_sys::osdp_pd_cap>,
-    channel: Option<Box<dyn Channel>>,
+    channel: Option<libosdp_sys::osdp_channel>,
     scbk: Option<[u8; 16]>,
 }
 impl PdInfo {
@@ -142,7 +142,7 @@ pub struct PdInfoBuilder {
     flags: OsdpFlag,
     id: PdId,
     cap: Vec<libosdp_sys::osdp_pd_cap>,
-    channel: Option<Box<dyn Channel>>,
+    channel: Option<libosdp_sys::osdp_channel>,
     scbk: Option<[u8; 16]>,
 }
 
@@ -217,7 +217,7 @@ impl PdInfoBuilder {
     }
 
     /// Set Osdp communication channel
-    pub fn channel(mut self, channel: Box<dyn Channel>) -> PdInfoBuilder {
+    pub fn channel(mut self, channel: libosdp_sys::osdp_channel) -> PdInfoBuilder {
         self.channel = Some(channel);
         self
     }
@@ -284,7 +284,7 @@ impl From<PdInfo> for OsdpPdInfoHandle {
             flags: info.flags.bits() as i32,
             id: info.id.into(),
             cap: cap as *mut _,
-            channel: info.channel.unwrap().into(),
+            channel: info.channel.expect("no channel provided"),
             scbk,
         })
     }
