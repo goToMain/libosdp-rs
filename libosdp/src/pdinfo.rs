@@ -253,18 +253,27 @@ impl PdInfo {
         let scbk = if let Some(key) = self.scbk {
             Box::into_raw(Box::new(key)) as *mut _
         } else {
-            std::ptr::null_mut::<u8>()
+            core::ptr::null_mut::<u8>()
         };
-        let mut cap = self.cap.clone();
-        let cap_ptr = cap.as_mut_ptr();
-        core::mem::forget(cap);
+        let cap = if !self.cap.is_empty() {
+            let mut cap = self.cap.clone();
+            cap.reserve(1);
+            cap.push(libosdp_sys::osdp_pd_cap {
+                function_code: -1i8 as u8,
+                compliance_level: 0,
+                num_items: 0,
+            });
+            Box::into_raw(cap.into_boxed_slice()) as *mut _
+        } else {
+            core::ptr::null_mut::<libosdp_sys::osdp_pd_cap>()
+        };
         libosdp_sys::osdp_pd_info_t {
             name: self.name.clone().into_raw(),
             baud_rate: self.baud_rate,
             address: self.address,
             flags: self.flags.bits() as i32,
             id: self.id.into(),
-            cap: cap_ptr,
+            cap: cap as *mut _,
             channel: self.channel.take().unwrap().into(),
             scbk,
         }
