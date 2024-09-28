@@ -250,19 +250,21 @@ impl PdInfoBuilder {
 impl PdInfo {
     /// Get a C-repr struct for PdInfo that LibOSDP can operate on.
     pub fn as_struct(&mut self) -> libosdp_sys::osdp_pd_info_t {
-        let scbk;
-        if let Some(key) = self.scbk.as_mut() {
-            scbk = key.as_mut_ptr();
+        let scbk = if let Some(key) = self.scbk {
+            Box::into_raw(Box::new(key)) as *mut _
         } else {
-            scbk = std::ptr::null_mut::<u8>();
-        }
+            std::ptr::null_mut::<u8>()
+        };
+        let mut cap = self.cap.clone();
+        let cap_ptr = cap.as_mut_ptr();
+        core::mem::forget(cap);
         libosdp_sys::osdp_pd_info_t {
-            name: self.name.as_ptr(),
+            name: self.name.clone().into_raw(),
             baud_rate: self.baud_rate,
             address: self.address,
             flags: self.flags.bits() as i32,
             id: self.id.into(),
-            cap: self.cap.as_ptr(),
+            cap: cap_ptr,
             channel: self.channel.take().unwrap().into(),
             scbk,
         }
