@@ -6,8 +6,7 @@
 use anyhow::bail;
 use anyhow::Context;
 use configparser::ini::Ini;
-use libosdp::PdInfoBuilder;
-use libosdp::{OsdpFlag, PdCapability, PdId, PdInfo};
+use libosdp::{ControlPanelBuilder, OsdpFlag, PdCapability, PdId, PdInfoBuilder};
 use rand::Rng;
 use std::{
     fmt::Write,
@@ -134,30 +133,26 @@ impl CpConfig {
         })
     }
 
-    pub fn pd_info(&self) -> Result<Vec<PdInfo>> {
+    pub fn pd_info(&self) -> Result<ControlPanelBuilder> {
         let mut runtime_dir = self.runtime_dir.clone();
         runtime_dir.pop();
-        self.pd_data
-            .iter()
-            .map(|d| {
-                let parts: Vec<&str> = d.channel.split("::").collect();
-                if parts[0] != "unix" {
-                    bail!("Only unix channel is supported for now")
-                }
-                let path = runtime_dir.join(format!("{}/{}.sock", d.name, parts[1]).as_str());
-                let channel =
-                    UnixChannel::connect(&path).context("Unable to connect to PD channel")?;
-                let pd_info = PdInfoBuilder::new()
-                    .name(&self.name)?
-                    .address(d.address)?
-                    .baud_rate(115200)?
-                    .flag(d.flags)
-                    .channel(Box::new(channel))
-                    .secure_channel_key(d.key_store.load()?)
-                    .build();
-                Ok(pd_info)
-            })
-            .collect()
+        let mut cp = ControlPanelBuilder::new();
+        for d in self.pd_data.iter() {
+            let parts: Vec<&str> = d.channel.split("::").collect();
+            if parts[0] != "unix" {
+                bail!("Only unix channel is supported for now")
+            }
+            let path = runtime_dir.join(format!("{}/{}.sock", d.name, parts[1]).as_str());
+            let channel = UnixChannel::connect(&path).context("Unable to connect to PD channel")?;
+            let pd_info = PdInfoBuilder::new()
+                .name(&self.name)?
+                .address(d.address)?
+                .baud_rate(115200)?
+                .flag(d.flags)
+                .secure_channel_key(d.key_store.load()?);
+            cp = cp.add_channel(Box::new(channel), vec![pd_info]);
+        }
+        Ok(cp)
     }
 }
 
@@ -238,7 +233,7 @@ impl PdConfig {
         })
     }
 
-    pub fn pd_info(&self) -> Result<PdInfo> {
+    pub fn pd_info(&self) -> Result<(Box<dyn libosdp::Channel>, PdInfoBuilder)> {
         let parts: Vec<&str> = self.channel.split("::").collect();
         if parts[0] != "unix" {
             bail!("Only unix channel is supported for now")
@@ -252,10 +247,8 @@ impl PdConfig {
             .flag(self.flags)
             .capabilities(&self.pd_cap)
             .id(&self.pd_id)
-            .channel(Box::new(channel))
-            .secure_channel_key(self.key_store.load()?)
-            .build();
-        Ok(pd_info)
+            .secure_channel_key(self.key_store.load()?);
+        Ok((Box::new(channel), pd_info))
     }
 }
 

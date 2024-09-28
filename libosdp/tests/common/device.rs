@@ -9,8 +9,8 @@ use std::{
 };
 
 use libosdp::{
-    ControlPanel, OsdpCommand, OsdpEvent, PdCapEntity, PdCapability, PdInfoBuilder,
-    PeripheralDevice,
+    ControlPanel, ControlPanelBuilder, OsdpCommand, OsdpEvent, PdCapEntity, PdCapability,
+    PdInfoBuilder, PeripheralDevice,
 };
 type Result<T> = core::result::Result<T, libosdp::OsdpError>;
 
@@ -32,10 +32,10 @@ impl CpDevice {
             .name("PD 101")?
             .address(101)?
             .baud_rate(115200)?
-            .channel(bus)
-            .secure_channel_key(pd_0_key)
-            .build();
-        let mut cp = ControlPanel::new(vec![pd_0])?;
+            .secure_channel_key(pd_0_key);
+        let mut cp = ControlPanelBuilder::new()
+            .add_channel(bus, vec![pd_0])
+            .build()?;
         let (event_tx, event_rx) = std::sync::mpsc::channel::<(i32, OsdpEvent)>();
 
         cp.set_event_callback(|pd, event| {
@@ -90,10 +90,8 @@ impl PdDevice {
             .capability(PdCapability::CommunicationSecurity(PdCapEntity::new(1, 1)))
             .capability(PdCapability::AudibleOutput(PdCapEntity::new(1, 1)))
             .capability(PdCapability::LedControl(PdCapEntity::new(1, 1)))
-            .channel(bus)
-            .secure_channel_key(key)
-            .build();
-        let mut pd = PeripheralDevice::new(pd_info)?;
+            .secure_channel_key(key);
+        let mut pd = PeripheralDevice::new(pd_info, bus)?;
         let (cmd_tx, cmd_rx) = std::sync::mpsc::channel::<OsdpCommand>();
         pd.set_command_callback(|command| {
             cmd_tx.send(command).unwrap();
