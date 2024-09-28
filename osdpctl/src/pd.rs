@@ -29,8 +29,8 @@ fn setup(dev: &PdConfig, daemonize: bool) -> Result<()> {
 
 pub fn main(dev: PdConfig, daemonize: bool) -> Result<()> {
     setup(&dev, daemonize)?;
-    let pd_info = dev.pd_info().context("Failed to create PD info")?;
-    let mut pd = PeripheralDevice::new(pd_info)?;
+    let (channel, pd_info) = dev.pd_info().context("Failed to create PD info")?;
+    let mut pd = PeripheralDevice::new(pd_info, channel)?;
     pd.set_command_callback(|command| {
         match command {
             OsdpCommand::Led(c) => {

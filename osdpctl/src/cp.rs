@@ -7,7 +7,7 @@ use std::{thread, time::Duration};
 
 use crate::config::CpConfig;
 use anyhow::Context;
-use libosdp::{ControlPanel, OsdpEvent};
+use libosdp::OsdpEvent;
 use std::io::Write;
 
 type Result<T> = anyhow::Result<T, anyhow::Error>;
@@ -29,8 +29,8 @@ fn setup(dev: &CpConfig, daemonize: bool) -> Result<()> {
 
 pub fn main(dev: CpConfig, daemonize: bool) -> Result<()> {
     setup(&dev, daemonize)?;
-    let pd_info = dev.pd_info().context("Failed to create PD info list")?;
-    let mut cp = ControlPanel::new(pd_info)?;
+    let cp = dev.pd_info().context("Failed to create PD info list")?;
+    let mut cp = cp.build()?;
     cp.set_event_callback(|pd, event| {
         match event {
             OsdpEvent::CardRead(e) => {
