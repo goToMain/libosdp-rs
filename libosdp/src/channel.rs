@@ -44,8 +44,6 @@ impl From<std::io::Error> for ChannelError {
 impl<E: embedded_io::Error + Sized> From<E> for ChannelError {
     fn from(value: E) -> Self {
         match value.kind() {
-            //TODO determine if this is the correct error kind
-            // embedded_io::ErrorKind::TimedOut => ChannelError::WouldBlock,
             _ => ChannelError::TransportError,
         }
     }
