@@ -13,6 +13,7 @@
 //! to the CP.
 
 use crate::{OsdpCommand, OsdpError, OsdpEvent, OsdpFileOps, PdCapability, PdInfo};
+use alloc::{boxed::Box, vec::Vec};
 use core::ffi::c_void;
 use log::{debug, error, info, warn};
 

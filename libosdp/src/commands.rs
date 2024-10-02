@@ -8,6 +8,7 @@
 //! such commands though [`OsdpCommand`].
 
 use crate::OsdpStatusReport;
+use alloc::vec::Vec;
 use serde::{Deserialize, Serialize};
 
 use super::ConvertEndian;

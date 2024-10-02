@@ -83,11 +83,8 @@ pub use pdid::*;
 pub use pdinfo::*;
 
 #[allow(unused_imports)]
-use alloc::{
-    borrow::ToOwned, boxed::Box, ffi::CString, format, str::FromStr, string::String, sync::Arc,
-    vec, vec::Vec,
-};
-use once_cell::sync::Lazy;
+use alloc::{borrow::ToOwned, boxed::Box, format, string::String};
+
 #[cfg(feature = "std")]
 use thiserror::Error;
 
@@ -198,7 +195,7 @@ bitflags::bitflags! {
     }
 }
 
-impl FromStr for OsdpFlag {
+impl core::str::FromStr for OsdpFlag {
     type Err = OsdpError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -216,22 +213,16 @@ fn cstr_to_string(s: *const ::core::ffi::c_char) -> String {
     s.to_str().unwrap().to_owned()
 }
 
-static VERSION: Lazy<Arc<String>> = Lazy::new(|| {
-    let s = unsafe { libosdp_sys::osdp_get_version() };
-    Arc::new(cstr_to_string(s))
-});
-
-static SOURCE_INFO: Lazy<Arc<String>> = Lazy::new(|| {
-    let s = unsafe { libosdp_sys::osdp_get_source_info() };
-    Arc::new(cstr_to_string(s))
-});
-
 /// Get LibOSDP version
-pub fn get_version() -> String {
-    VERSION.as_ref().clone()
+pub fn get_version() -> &'static str {
+    let s = unsafe { libosdp_sys::osdp_get_version() };
+    let s = unsafe { core::ffi::CStr::from_ptr(s) };
+    s.to_str().unwrap()
 }
 
 /// Get LibOSDP source info string
-pub fn get_source_info() -> String {
-    SOURCE_INFO.as_ref().clone()
+pub fn get_source_info() -> &'static str {
+    let s = unsafe { libosdp_sys::osdp_get_source_info() };
+    let s = unsafe { core::ffi::CStr::from_ptr(s) };
+    s.to_str().unwrap()
 }

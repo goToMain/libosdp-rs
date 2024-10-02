@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+use alloc::format;
 use core::str::FromStr;
 
 use crate::OsdpError;

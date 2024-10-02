@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-use alloc::ffi::CString;
+use alloc::{boxed::Box, ffi::CString, format, string::String, vec::Vec};
 
 use crate::{Channel, OsdpError, OsdpFlag, PdCapability, PdId};
 
@@ -254,7 +254,7 @@ impl PdInfo {
         if let Some(key) = self.scbk.as_mut() {
             scbk = key.as_mut_ptr();
         } else {
-            scbk = std::ptr::null_mut::<u8>();
+            scbk = core::ptr::null_mut::<u8>();
         }
         libosdp_sys::osdp_pd_info_t {
             name: self.name.as_ptr(),

@@ -16,6 +16,7 @@
 //! This module provides a way to define an OSDP channel and export it to
 //! LibOSDP.
 
+use alloc::{boxed::Box, vec};
 use core::ffi::c_void;
 
 /// OSDP channel errors
@@ -29,10 +30,20 @@ pub enum ChannelError {
     TransportError,
 }
 
+#[cfg(feature = "std")]
 impl From<std::io::Error> for ChannelError {
     fn from(value: std::io::Error) -> Self {
         match value.kind() {
             std::io::ErrorKind::WouldBlock => ChannelError::WouldBlock,
+            _ => ChannelError::TransportError,
+        }
+    }
+}
+
+#[cfg(not(feature = "std"))]
+impl<E: embedded_io::Error + Sized> From<E> for ChannelError {
+    fn from(value: E) -> Self {
+        match value.kind() {
             _ => ChannelError::TransportError,
         }
     }

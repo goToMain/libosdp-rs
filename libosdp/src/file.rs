@@ -6,6 +6,7 @@
 //! OSDP provides a means to send files from CP to a Peripheral Device (PD).
 //! This module adds the required components to achieve this effect.
 
+use alloc::{boxed::Box, vec};
 use core::ffi::c_void;
 
 type Result<T> = core::result::Result<T, crate::OsdpError>;
@@ -57,7 +58,7 @@ unsafe extern "C" fn file_read(data: *mut c_void, buf: *mut c_void, size: i32, o
             -1
         }
     };
-    std::ptr::copy_nonoverlapping(read_buf.as_mut_ptr(), buf as *mut u8, len as usize);
+    core::ptr::copy_nonoverlapping(read_buf.as_mut_ptr(), buf as *mut u8, len as usize);
     len
 }
 
@@ -70,7 +71,7 @@ unsafe extern "C" fn file_write(
     let ctx: *mut Box<dyn OsdpFileOps> = data as *mut _;
     let ctx = ctx.as_ref().unwrap();
     let mut write_buf = vec![0u8; size as usize];
-    std::ptr::copy_nonoverlapping(buf as *mut u8, write_buf.as_mut_ptr(), size as usize);
+    core::ptr::copy_nonoverlapping(buf as *mut u8, write_buf.as_mut_ptr(), size as usize);
     match ctx.offset_write(&write_buf, offset as u64) {
         Ok(len) => len as i32,
         Err(e) => {
