@@ -57,6 +57,9 @@ where
 
 fn cp_setup(info: Vec<libosdp_sys::osdp_pd_info_t>) -> Result<*mut c_void> {
     let ctx = unsafe { libosdp_sys::osdp_cp_setup(info.len() as i32, info.as_ptr()) };
+    for pd in info.into_iter() {
+        crate::drop_osdp_pd_info(pd);
+    }
     if ctx.is_null() {
         Err(OsdpError::Setup)
     } else {

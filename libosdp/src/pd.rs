@@ -58,7 +58,9 @@ where
 }
 
 fn pd_setup(mut info: PdInfo) -> Result<*mut c_void> {
-    let ctx = unsafe { libosdp_sys::osdp_pd_setup(&info.as_struct()) };
+    let info_struct = info.as_struct();
+    let ctx = unsafe { libosdp_sys::osdp_pd_setup(&info_struct) };
+    crate::drop_osdp_pd_info(info_struct);
     if ctx.is_null() {
         Err(OsdpError::Setup)
     } else {
