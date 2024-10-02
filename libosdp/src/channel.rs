@@ -16,6 +16,7 @@
 //! This module provides a way to define an OSDP channel and export it to
 //! LibOSDP.
 
+use crate::{vec, Box};
 use core::ffi::c_void;
 
 /// OSDP channel errors
@@ -29,6 +30,7 @@ pub enum ChannelError {
     TransportError,
 }
 
+#[cfg(feature = "std")]
 impl From<std::io::Error> for ChannelError {
     fn from(value: std::io::Error) -> Self {
         match value.kind() {
@@ -38,9 +40,20 @@ impl From<std::io::Error> for ChannelError {
     }
 }
 
+#[cfg(not(feature = "std"))]
+impl<E: embedded_io::Error + Sized> From<E> for ChannelError {
+    fn from(value: E) -> Self {
+        match value.kind() {
+            //TODO determine if this is the correct error kind
+            // embedded_io::ErrorKind::TimedOut => ChannelError::WouldBlock,
+            _ => ChannelError::TransportError,
+        }
+    }
+}
+
 /// The Channel trait acts as an interface for all channel implementors. See
 /// module description for the definition of a "channel" in LibOSDP.
-pub trait Channel: Send + Sync {
+pub trait Channel: Send {
     /// Since OSDP channels can be multi-drop (more than one PD can talk to a
     /// CP on the same channel) and LibOSDP supports mixing multi-drop
     /// connections among PDs it needs a way to identify each unique channel by

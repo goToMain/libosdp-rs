@@ -57,10 +57,10 @@ fn main() -> Result<(), OsdpError> {
         .address(101)?
         .baud_rate(115200)?
         .flag(OsdpFlag::EnforceSecure)
-        .channel(Box::new(channel))
-        .secure_channel_key(pd_0_key)
-        .build();
-    let mut cp = libosdp::ControlPanel::new(vec![pd_0])?;
+        .secure_channel_key(pd_0_key);
+    let mut cp = libosdp::ControlPanelBuilder::new()
+        .add_channel(Box::new(channel), vec![pd_0])
+        .build()?;
     loop {
         cp.refresh();
         thread::sleep(Duration::from_millis(50));

@@ -5,10 +5,10 @@
 
 use alloc::ffi::CString;
 
-use crate::{Channel, OsdpError, OsdpFlag, PdCapability, PdId};
+use crate::{format, Box, OsdpError, OsdpFlag, PdCapability, PdId, String, Vec};
 
 /// OSDP PD Information. This struct is used to describe a PD to LibOSDP
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct PdInfo {
     name: CString,
     address: i32,
@@ -16,7 +16,7 @@ pub struct PdInfo {
     flags: OsdpFlag,
     id: PdId,
     cap: Vec<libosdp_sys::osdp_pd_cap>,
-    channel: Option<Box<dyn Channel>>,
+    channel: Option<libosdp_sys::osdp_channel>,
     scbk: Option<[u8; 16]>,
 }
 impl PdInfo {
@@ -142,7 +142,7 @@ pub struct PdInfoBuilder {
     flags: OsdpFlag,
     id: PdId,
     cap: Vec<libosdp_sys::osdp_pd_cap>,
-    channel: Option<Box<dyn Channel>>,
+    channel: Option<libosdp_sys::osdp_channel>,
     scbk: Option<[u8; 16]>,
 }
 
@@ -217,7 +217,7 @@ impl PdInfoBuilder {
     }
 
     /// Set Osdp communication channel
-    pub fn channel(mut self, channel: Box<dyn Channel>) -> PdInfoBuilder {
+    pub(crate) fn channel(mut self, channel: libosdp_sys::osdp_channel) -> PdInfoBuilder {
         self.channel = Some(channel);
         self
     }
@@ -250,20 +250,31 @@ impl PdInfoBuilder {
 impl PdInfo {
     /// Get a C-repr struct for PdInfo that LibOSDP can operate on.
     pub fn as_struct(&mut self) -> libosdp_sys::osdp_pd_info_t {
-        let scbk;
-        if let Some(key) = self.scbk.as_mut() {
-            scbk = key.as_mut_ptr();
+        let scbk = if let Some(key) = self.scbk {
+            Box::into_raw(Box::new(key)) as *mut _
         } else {
-            scbk = std::ptr::null_mut::<u8>();
-        }
+            core::ptr::null_mut::<u8>()
+        };
+        let cap = if !self.cap.is_empty() {
+            let mut cap = self.cap.clone();
+            cap.reserve(1);
+            cap.push(libosdp_sys::osdp_pd_cap {
+                function_code: -1i8 as u8,
+                compliance_level: 0,
+                num_items: 0,
+            });
+            Box::into_raw(cap.into_boxed_slice()) as *mut _
+        } else {
+            core::ptr::null_mut::<libosdp_sys::osdp_pd_cap>()
+        };
         libosdp_sys::osdp_pd_info_t {
-            name: self.name.as_ptr(),
+            name: self.name.clone().into_raw(),
             baud_rate: self.baud_rate,
             address: self.address,
             flags: self.flags.bits() as i32,
             id: self.id.into(),
-            cap: self.cap.as_ptr(),
-            channel: self.channel.take().unwrap().into(),
+            cap: cap as *mut _,
+            channel: self.channel.take().expect("no channel provided"),
             scbk,
         }
     }
