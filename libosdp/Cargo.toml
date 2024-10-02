@@ -29,7 +29,7 @@ sha256 = "1.5.0"
 
 [features]
 default = ["std"]
-std = ["libosdp-sys/std", "thiserror", "serde/std"]
+std = ["thiserror", "serde/std"]
 
 [[example]]
 name = "cp"

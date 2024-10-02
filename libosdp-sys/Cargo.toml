@@ -19,8 +19,6 @@ build-target = "0.4.0"
 cc = "1.0.83"
 
 [features]
-default = ["std"]
-std = []
 packet_trace = []
 data_trace = []
 skip_mark_byte = []
