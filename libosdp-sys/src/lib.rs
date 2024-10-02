@@ -9,4 +9,4 @@
 #![allow(missing_docs)]
 #![allow(unused)]
 
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+core::include!(core::concat!(core::env!("OUT_DIR"), "/bindings.rs"));
