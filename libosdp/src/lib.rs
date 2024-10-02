@@ -83,9 +83,8 @@ pub use pdid::*;
 pub use pdinfo::*;
 
 #[allow(unused_imports)]
-use alloc::{
-    borrow::ToOwned, boxed::Box, ffi::CString, format, str::FromStr, string::String, vec, vec::Vec,
-};
+use alloc::{borrow::ToOwned, boxed::Box, format, string::String};
+
 #[cfg(feature = "std")]
 use thiserror::Error;
 
@@ -196,7 +195,7 @@ bitflags::bitflags! {
     }
 }
 
-impl FromStr for OsdpFlag {
+impl core::str::FromStr for OsdpFlag {
     type Err = OsdpError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {

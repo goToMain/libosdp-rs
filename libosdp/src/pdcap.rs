@@ -3,9 +3,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+use alloc::format;
 use core::str::FromStr;
 
-use crate::{format, OsdpError};
+use crate::OsdpError;
 
 /// PD capability entity to be used inside [`PdCapability`]
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]

@@ -3,9 +3,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-use alloc::ffi::CString;
+use alloc::{boxed::Box, ffi::CString, format, string::String, vec::Vec};
 
-use crate::{format, Box, Channel, OsdpError, OsdpFlag, PdCapability, PdId, String, Vec};
+use crate::{Channel, OsdpError, OsdpFlag, PdCapability, PdId};
 
 /// OSDP PD Information. This struct is used to describe a PD to LibOSDP
 #[derive(Debug, Default)]

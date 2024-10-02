@@ -7,9 +7,9 @@
 //! (PD) on the OSDP bus. It can send commands to and receive events from PDs.
 
 use crate::{
-    file::OsdpFileOps, Box, OsdpCommand, OsdpError, OsdpEvent, OsdpFlag, PdCapability, PdId,
-    PdInfo, Vec,
+    file::OsdpFileOps, OsdpCommand, OsdpError, OsdpEvent, OsdpFlag, PdCapability, PdId, PdInfo,
 };
+use alloc::{boxed::Box, vec::Vec};
 use core::ffi::c_void;
 use log::{debug, error, info, warn};
 

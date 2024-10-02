@@ -8,7 +8,8 @@
 //! etc.,). They do this by creating an "event" and sending it to the CP. This
 //! module is responsible to handling such events though [`OsdpEvent`].
 
-use crate::{OsdpError, Vec};
+use crate::OsdpError;
+use alloc::vec::Vec;
 use serde::{Deserialize, Serialize};
 
 use super::ConvertEndian;

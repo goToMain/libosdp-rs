@@ -16,7 +16,7 @@
 //! This module provides a way to define an OSDP channel and export it to
 //! LibOSDP.
 
-use crate::{vec, Box};
+use alloc::{boxed::Box, vec};
 use core::ffi::c_void;
 
 /// OSDP channel errors

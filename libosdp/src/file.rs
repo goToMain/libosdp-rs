@@ -6,7 +6,7 @@
 //! OSDP provides a means to send files from CP to a Peripheral Device (PD).
 //! This module adds the required components to achieve this effect.
 
-use crate::{vec, Box};
+use alloc::{boxed::Box, vec};
 use core::ffi::c_void;
 
 type Result<T> = core::result::Result<T, crate::OsdpError>;
