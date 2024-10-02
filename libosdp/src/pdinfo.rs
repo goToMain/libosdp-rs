@@ -279,3 +279,26 @@ impl PdInfo {
         }
     }
 }
+
+pub(crate) fn drop_osdp_pd_info(info: libosdp_sys::osdp_pd_info_t) {
+    unsafe {
+        if !info.name.is_null() {
+            drop(CString::from_raw(info.name as *mut _));
+        }
+        if !info.cap.is_null() {
+            let mut cap = info.cap as *mut libosdp_sys::osdp_pd_cap;
+            while (*cap).function_code != -1i8 as u8 {
+                cap = cap.add(1);
+            }
+            let len = (cap.offset_from(info.cap) + 1) as usize;
+            drop(Vec::from_raw_parts(
+                info.cap as *mut libosdp_sys::osdp_pd_cap,
+                len,
+                len,
+            ));
+        }
+        if !info.scbk.is_null() {
+            drop(Box::from_raw(info.scbk as *mut [u8; 16]));
+        }
+    }
+}
