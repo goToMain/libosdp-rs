@@ -1,3 +1,4 @@
+#![cfg_attr(not(feature = "std"), no_std)]
 //! Auto generated (bindgen) wrapper for LibOSDP C API exposed from osdp.h
 //! [here](https://github.com/goToMain/libosdp/blob/master/include/osdp.h).
 
