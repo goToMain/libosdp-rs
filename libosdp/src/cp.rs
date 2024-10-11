@@ -55,8 +55,8 @@ where
     trampoline::<F>
 }
 
-fn cp_setup(info: Vec<libosdp_sys::osdp_pd_info_t>) -> Result<*mut c_void> {
-    let ctx = unsafe { libosdp_sys::osdp_cp_setup(info.len() as i32, info.as_ptr()) };
+fn cp_setup(info: Vec<crate::OsdpPdInfoHandle>) -> Result<*mut c_void> {
+    let ctx = unsafe { libosdp_sys::osdp_cp_setup(info.len() as i32, info.as_ptr() as *const _) };
     if ctx.is_null() {
         Err(OsdpError::Setup)
     } else {
@@ -74,12 +74,11 @@ unsafe impl Send for ControlPanel {}
 
 impl ControlPanel {
     /// Create a new CP context for the list of PDs described by the [`PdInfo`] vector.
-    pub fn new(mut pd_info: Vec<PdInfo>) -> Result<Self> {
+    pub fn new(pd_info: Vec<PdInfo>) -> Result<Self> {
         if pd_info.len() > 126 {
             return Err(OsdpError::PdInfo("max PD count exceeded"));
         }
-        let info: Vec<libosdp_sys::osdp_pd_info_t> =
-            pd_info.iter_mut().map(|i| i.as_struct()).collect();
+        let info: Vec<crate::OsdpPdInfoHandle> = pd_info.into_iter().map(|i| i.into()).collect();
         unsafe { libosdp_sys::osdp_set_log_callback(Some(log_handler)) };
         Ok(Self {
             ctx: cp_setup(info)?,

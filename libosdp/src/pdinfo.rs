@@ -3,8 +3,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+use core::ops::Deref;
 use alloc::{boxed::Box, ffi::CString, format, string::String, vec::Vec};
-
 use crate::{Channel, OsdpError, OsdpFlag, PdCapability, PdId};
 
 /// OSDP PD Information. This struct is used to describe a PD to LibOSDP
@@ -247,24 +247,71 @@ impl PdInfoBuilder {
     }
 }
 
-impl PdInfo {
-    /// Get a C-repr struct for PdInfo that LibOSDP can operate on.
-    pub fn as_struct(&mut self) -> libosdp_sys::osdp_pd_info_t {
-        let scbk;
-        if let Some(key) = self.scbk.as_mut() {
-            scbk = key.as_mut_ptr();
+#[repr(transparent)]
+pub(crate) struct OsdpPdInfoHandle(pub libosdp_sys::osdp_pd_info_t);
+
+impl Deref for OsdpPdInfoHandle {
+    type Target = libosdp_sys::osdp_pd_info_t;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl From<PdInfo> for OsdpPdInfoHandle {
+    fn from(info: PdInfo) -> OsdpPdInfoHandle {
+        let scbk = if let Some(key) = info.scbk {
+            Box::into_raw(Box::new(key)) as *mut _
         } else {
-            scbk = core::ptr::null_mut::<u8>();
-        }
-        libosdp_sys::osdp_pd_info_t {
-            name: self.name.as_ptr(),
-            baud_rate: self.baud_rate,
-            address: self.address,
-            flags: self.flags.bits() as i32,
-            id: self.id.into(),
-            cap: self.cap.as_ptr(),
-            channel: self.channel.take().unwrap().into(),
+            core::ptr::null_mut::<u8>()
+        };
+        let cap = if !info.cap.is_empty() {
+            let mut cap = info.cap.clone();
+            cap.reserve(1);
+            cap.push(libosdp_sys::osdp_pd_cap {
+                function_code: -1i8 as u8,
+                compliance_level: 0,
+                num_items: 0,
+            });
+            Box::into_raw(cap.into_boxed_slice()) as *mut _
+        } else {
+            core::ptr::null_mut::<libosdp_sys::osdp_pd_cap>()
+        };
+        OsdpPdInfoHandle(libosdp_sys::osdp_pd_info_t {
+            name: info.name.clone().into_raw(),
+            baud_rate: info.baud_rate,
+            address: info.address,
+            flags: info.flags.bits() as i32,
+            id: info.id.into(),
+            cap: cap as *mut _,
+            channel: info.channel.unwrap().into(),
             scbk,
+        })
+    }
+}
+
+impl Drop for OsdpPdInfoHandle {
+    fn drop(&mut self) {
+        unsafe {
+            let info = self.0;
+            if !info.name.is_null() {
+                drop(CString::from_raw(info.name as *mut _));
+            }
+            if !info.cap.is_null() {
+                let mut cap = info.cap as *mut libosdp_sys::osdp_pd_cap;
+                while (*cap).function_code != -1i8 as u8 {
+                    cap = cap.add(1);
+                }
+                let len = (cap.offset_from(info.cap) + 1) as usize;
+                drop(Vec::from_raw_parts(
+                    info.cap as *mut libosdp_sys::osdp_pd_cap,
+                    len,
+                    len,
+                ));
+            }
+            if !info.scbk.is_null() {
+                drop(Box::from_raw(info.scbk as *mut [u8; 16]));
+            }
         }
     }
 }

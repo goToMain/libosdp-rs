@@ -58,8 +58,9 @@ where
     trampoline::<F>
 }
 
-fn pd_setup(mut info: PdInfo) -> Result<*mut c_void> {
-    let ctx = unsafe { libosdp_sys::osdp_pd_setup(&info.as_struct()) };
+fn pd_setup(info: PdInfo) -> Result<*mut c_void> {
+    let info: crate::OsdpPdInfoHandle = info.into();
+    let ctx = unsafe { libosdp_sys::osdp_pd_setup(&*info) };
     if ctx.is_null() {
         Err(OsdpError::Setup)
     } else {
