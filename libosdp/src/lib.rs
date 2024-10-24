@@ -145,6 +145,25 @@ pub enum OsdpError {
     Unknown,
 }
 
+#[cfg(feature = "defmt-03")]
+impl defmt::Format for OsdpError {
+    fn format(&self, f: defmt::Formatter<'_>) {
+        match self {
+            OsdpError::PdInfo(e) => defmt::write!(f, "OsdpError::PdInfo({0})", e),
+            OsdpError::Command => defmt::write!(f, "OsdpError::Command"),
+            OsdpError::Event => defmt::write!(f, "OsdpError::Event"),
+            OsdpError::Query(e) => defmt::write!(f, "OsdpError::Query({0})", e),
+            OsdpError::FileTransfer(e) => defmt::write!(f, "OsdpError::FileTransfer({0})", e),
+            OsdpError::Setup => defmt::write!(f, "OsdpError::Setup"),
+            OsdpError::Parse(e) => defmt::write!(f, "OsdpError::Parse({0})", e.as_str()),
+            OsdpError::Channel(e) => defmt::write!(f, "OsdpError::Channel({0})", e),
+            OsdpError::PdInfoBuilder(e) => defmt::write!(f, "OsdpError::PdInfoBuilder({0})", e),
+            OsdpError::IO(_) => defmt::write!(f, "OsdpError::IO"), // Error cannot be formatted, because there is no way to set defmt::Format as a bound
+            OsdpError::Unknown => defmt::write!(f, "OsdpError::Unknown"),
+        }
+    }
+}
+
 impl From<core::convert::Infallible> for OsdpError {
     fn from(_: core::convert::Infallible) -> Self {
         unreachable!()

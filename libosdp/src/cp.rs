@@ -11,6 +11,9 @@ use crate::{
 };
 use alloc::{boxed::Box, vec::Vec};
 use core::ffi::c_void;
+#[cfg(feature = "defmt-03")]
+use defmt::{debug, error, info, warn};
+#[cfg(not(feature = "defmt-03"))]
 use log::{debug, error, info, warn};
 
 type Result<T> = core::result::Result<T, OsdpError>;
@@ -24,14 +27,14 @@ unsafe extern "C" fn log_handler(
     let msg = crate::cstr_to_string(msg);
     let msg = msg.trim();
     match log_level as libosdp_sys::osdp_log_level_e {
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_EMERG => error!("CP: {msg}"),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_ALERT => error!("CP: {msg}"),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_CRIT => error!("CP: {msg}"),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_ERROR => error!("CP: {msg}"),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_WARNING => warn!("CP: {msg}"),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_NOTICE => warn!("CP: {msg}"),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_INFO => info!("CP: {msg}"),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_DEBUG => debug!("CP: {msg}"),
+        libosdp_sys::osdp_log_level_e_OSDP_LOG_EMERG => error!("CP: {}", msg),
+        libosdp_sys::osdp_log_level_e_OSDP_LOG_ALERT => error!("CP: {}", msg),
+        libosdp_sys::osdp_log_level_e_OSDP_LOG_CRIT => error!("CP: {}", msg),
+        libosdp_sys::osdp_log_level_e_OSDP_LOG_ERROR => error!("CP: {}", msg),
+        libosdp_sys::osdp_log_level_e_OSDP_LOG_WARNING => warn!("CP: {}", msg),
+        libosdp_sys::osdp_log_level_e_OSDP_LOG_NOTICE => warn!("CP: {}", msg),
+        libosdp_sys::osdp_log_level_e_OSDP_LOG_INFO => info!("CP: {}", msg),
+        libosdp_sys::osdp_log_level_e_OSDP_LOG_DEBUG => debug!("CP: {}", msg),
         _ => panic!("Unknown log level"),
     };
 }
