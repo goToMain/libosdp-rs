@@ -16,9 +16,13 @@ use super::ConvertEndian;
 
 type Result<T> = core::result::Result<T, OsdpError>;
 
+#[cfg(feature = "defmt-03")]
+use defmt::panic;
+
 /// Various card formats that a PD can support. This is sent to CP when a PD
 /// must report a card read
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum OsdpCardFormats {
     /// Card format is not specified
     Unspecified,
@@ -62,6 +66,7 @@ impl From<OsdpCardFormats> for libosdp_sys::osdp_event_cardread_format_e {
 
 /// Event that describes card read activity on the PD
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub struct OsdpEventCardRead {
     /// Reader (another device connected to this PD) which caused this event
     ///
@@ -157,6 +162,7 @@ impl From<OsdpEventCardRead> for libosdp_sys::osdp_event_cardread {
 
 /// Event to describe a key press activity on the PD
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub struct OsdpEventKeyPress {
     /// Reader (another device connected to this PD) which caused this event
     ///
@@ -202,6 +208,7 @@ impl From<OsdpEventKeyPress> for libosdp_sys::osdp_event_keypress {
 
 /// Event to transport a Manufacturer specific command's response.
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub struct OsdpEventMfgReply {
     /// 3-byte IEEE assigned OUI used as vendor code
     pub vendor_code: (u8, u8, u8),
@@ -242,6 +249,7 @@ impl From<OsdpEventMfgReply> for libosdp_sys::osdp_event_mfgrep {
 
 /// Status report type
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum OsdpStatusReportType {
     /// Input status report
     Input,
@@ -301,6 +309,7 @@ impl From<OsdpStatusReportType> for libosdp_sys::osdp_status_report_type {
 /// - PdCapability::OutputControl
 /// - PdCapability::ContactStatusMonitoring
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub struct OsdpStatusReport {
     type_: OsdpStatusReportType,
     nr_entries: usize,
@@ -352,6 +361,7 @@ impl From<OsdpStatusReport> for libosdp_sys::osdp_status_report {
 /// it to the CP. This module is responsible to handling such events though
 /// OsdpEvent.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum OsdpEvent {
     /// Event that describes card read activity on the PD
     CardRead(OsdpEventCardRead),

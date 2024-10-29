@@ -8,6 +8,10 @@
 
 use alloc::{boxed::Box, vec};
 use core::ffi::c_void;
+#[cfg(feature = "defmt-03")]
+use defmt::error;
+#[cfg(not(feature = "defmt-03"))]
+use log::error;
 
 type Result<T> = core::result::Result<T, crate::OsdpError>;
 
@@ -41,7 +45,7 @@ unsafe extern "C" fn file_open(data: *mut c_void, file_id: i32, size: *mut i32) 
             0
         }
         Err(e) => {
-            log::error!("open: {:?}", e);
+            error!("open: {:?}", e);
             -1
         }
     }
@@ -54,7 +58,7 @@ unsafe extern "C" fn file_read(data: *mut c_void, buf: *mut c_void, size: i32, o
     let len = match ctx.offset_read(&mut read_buf, offset as u64) {
         Ok(len) => len as i32,
         Err(e) => {
-            log::error!("file_read: {:?}", e);
+            error!("file_read: {:?}", e);
             -1
         }
     };
@@ -75,7 +79,7 @@ unsafe extern "C" fn file_write(
     match ctx.offset_write(&write_buf, offset as u64) {
         Ok(len) => len as i32,
         Err(e) => {
-            log::error!("file_write: {:?}", e);
+            error!("file_write: {:?}", e);
             -1
         }
     }
@@ -87,7 +91,7 @@ unsafe extern "C" fn file_close(data: *mut c_void) -> i32 {
     match ctx.close() {
         Ok(_) => 0,
         Err(e) => {
-            log::error!("file_close: {:?}", e);
+            error!("file_close: {:?}", e);
             -1
         }
     }
