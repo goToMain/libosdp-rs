@@ -88,7 +88,7 @@ use alloc::{borrow::ToOwned, boxed::Box, format, string::String};
 #[cfg(feature = "std")]
 use thiserror::Error;
 
-pub use cp::ControlPanel;
+pub use cp::{ControlPanel, ControlPanelBuilder};
 pub use pd::PeripheralDevice;
 
 /// OSDP public errors

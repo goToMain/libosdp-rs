@@ -51,7 +51,7 @@ impl<E: embedded_io::Error + Sized> From<E> for ChannelError {
 
 /// The Channel trait acts as an interface for all channel implementors. See
 /// module description for the definition of a "channel" in LibOSDP.
-pub trait Channel: Send + Sync {
+pub trait Channel: Send {
     /// Since OSDP channels can be multi-drop (more than one PD can talk to a
     /// CP on the same channel) and LibOSDP supports mixing multi-drop
     /// connections among PDs it needs a way to identify each unique channel by

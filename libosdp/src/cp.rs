@@ -7,7 +7,8 @@
 //! (PD) on the OSDP bus. It can send commands to and receive events from PDs.
 
 use crate::{
-    file::OsdpFileOps, OsdpCommand, OsdpError, OsdpEvent, OsdpFlag, PdCapability, PdId, PdInfo,
+    file::OsdpFileOps, Channel, OsdpCommand, OsdpError, OsdpEvent, OsdpFlag, PdCapability, PdId,
+    PdInfoBuilder,
 };
 use alloc::{boxed::Box, vec::Vec};
 use core::ffi::c_void;
@@ -64,6 +65,49 @@ fn cp_setup(info: Vec<crate::OsdpPdInfoHandle>) -> Result<*mut c_void> {
     }
 }
 
+/// Builder for creating a new `ControlPanel`.
+#[derive(Debug, Default)]
+pub struct ControlPanelBuilder {
+    channel_pds: Vec<(Box<dyn Channel>, Vec<PdInfoBuilder>)>,
+}
+
+impl ControlPanelBuilder {
+    /// Create a new instance of [`ControlPanelBuilder`].
+    pub const fn new() -> Self {
+        Self {
+            channel_pds: Vec::new(),
+        }
+    }
+
+    /// Add a new PDs and their shared channel to the CP.
+    pub fn add_channel(mut self, channel: Box<dyn Channel>, pd_info: Vec<PdInfoBuilder>) -> Self {
+        self.channel_pds.push((channel, pd_info));
+        self
+    }
+
+    /// Build the [`ControlPanel`] instance.
+    pub fn build(self) -> Result<ControlPanel> {
+        if self.channel_pds.len() > 126 {
+            return Err(OsdpError::PdInfo("max PD count exceeded"));
+        }
+        let info: Vec<crate::OsdpPdInfoHandle> = self
+            .channel_pds
+            .into_iter()
+            .map(|(channel, pd_info)| {
+                let channel: libosdp_sys::osdp_channel = channel.into();
+                pd_info
+                    .into_iter()
+                    .map(move |pd| pd.channel(channel).build().into())
+            })
+            .flatten()
+            .collect();
+        unsafe { libosdp_sys::osdp_set_log_callback(Some(log_handler)) };
+        Ok(ControlPanel {
+            ctx: cp_setup(info)?,
+        })
+    }
+}
+
 /// OSDP CP device context.
 #[derive(Debug)]
 pub struct ControlPanel {
@@ -73,18 +117,6 @@ pub struct ControlPanel {
 unsafe impl Send for ControlPanel {}
 
 impl ControlPanel {
-    /// Create a new CP context for the list of PDs described by the [`PdInfo`] vector.
-    pub fn new(pd_info: Vec<PdInfo>) -> Result<Self> {
-        if pd_info.len() > 126 {
-            return Err(OsdpError::PdInfo("max PD count exceeded"));
-        }
-        let info: Vec<crate::OsdpPdInfoHandle> = pd_info.into_iter().map(|i| i.into()).collect();
-        unsafe { libosdp_sys::osdp_set_log_callback(Some(log_handler)) };
-        Ok(Self {
-            ctx: cp_setup(info)?,
-        })
-    }
-
     /// The application must call this method periodically to refresh the
     /// underlying LibOSDP state. To meet the OSDP timing guarantees, this
     /// function must be called at least once every 50ms. This method does not

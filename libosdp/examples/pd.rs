@@ -60,10 +60,8 @@ fn main() -> Result<(), OsdpError> {
         .baud_rate(115200)?
         .flag(OsdpFlag::EnforceSecure)
         .capability(PdCapability::CommunicationSecurity(PdCapEntity::new(1, 1)))
-        .channel(Box::new(channel))
-        .secure_channel_key(key)
-        .build();
-    let mut pd = libosdp::PeripheralDevice::new(pd_info)?;
+        .secure_channel_key(key);
+    let mut pd = libosdp::PeripheralDevice::new(pd_info, Box::new(channel))?;
     pd.set_command_callback(|_| {
         println!("Received command!");
         0
