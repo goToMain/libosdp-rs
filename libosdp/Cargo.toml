@@ -16,10 +16,11 @@ categories = ["development-tools", "embedded"]
 bitflags = "2.4.0"
 embedded-io = { version = "0.6.1", features = ["alloc"] }
 libosdp-sys = { path = "../libosdp-sys", default-features = false }
-log = "0.4.20"
+log = { version = "0.4.20", optional = true }
 serde = { version = "1.0.192", features = ["derive", "alloc"], default-features = false }
 thiserror = { version = "1.0.50", optional = true }
 defmt = { version = "0.3", optional = true, features = ["alloc"] }
+itoa = "1.0.11"
 
 [dev-dependencies]
 env_logger = "0.11.3"
@@ -31,7 +32,8 @@ sha256 = "1.5.0"
 [features]
 default = ["std"]
 defmt-03 = ["embedded-io/defmt-03", "dep:defmt"]
-std = ["thiserror", "serde/std", "log/std"]
+log = ["dep:log"]
+std = ["thiserror", "serde/std", "log", "log/std"]
 
 [[example]]
 name = "cp"
