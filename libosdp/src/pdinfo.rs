@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{OsdpError, OsdpFlag, PdCapability, PdId};
-use alloc::{boxed::Box, ffi::CString, format, string::String, vec::Vec};
+use alloc::{boxed::Box, ffi::CString, string::String, vec::Vec};
 use core::ops::Deref;
 
 /// OSDP PD Information. This struct is used to describe a PD to LibOSDP
@@ -163,7 +163,7 @@ impl PdInfoBuilder {
     /// Set 7 bit PD address; the special address 0x7F is used for broadcast. So
     /// there can be 2^7-1 valid addresses on a bus.
     pub fn address(mut self, address: i32) -> Result<PdInfoBuilder, OsdpError> {
-        if address > 126 {
+        if address < 0 || address > 126 {
             return Err(OsdpError::PdInfoBuilder("invalid address"));
         }
         self.address = address;
@@ -231,9 +231,17 @@ impl PdInfoBuilder {
 
     /// Finalize the PdInfo from the current builder
     pub fn build(self) -> PdInfo {
-        let name = self
-            .name
-            .unwrap_or_else(|| CString::new(format!("PD-{}", self.address)).unwrap());
+        let name = self.name.unwrap_or_else(|| {
+            let mut buffer = itoa::Buffer::new();
+            let s = buffer.format(self.address as u8);
+            let mut buf = [0u8; 6];
+            let buf = &mut buf[..3 + s.len()];
+            buf[..3].copy_from_slice(b"PD-");
+            buf[3..].copy_from_slice(s.as_bytes());
+            CString::new(buf)
+                .ok() // panic can only happen if buf contained a null byte, which it never will
+                .expect("fallback PD name could not be constrcuted")
+        });
         PdInfo {
             name,
             address: self.address,

@@ -10,7 +10,7 @@ use alloc::{boxed::Box, vec};
 use core::ffi::c_void;
 #[cfg(feature = "defmt-03")]
 use defmt::error;
-#[cfg(not(feature = "defmt-03"))]
+#[cfg(all(feature = "log", not(feature = "defmt-03")))]
 use log::error;
 
 type Result<T> = core::result::Result<T, crate::OsdpError>;
@@ -44,8 +44,9 @@ unsafe extern "C" fn file_open(data: *mut c_void, file_id: i32, size: *mut i32) 
             }
             0
         }
-        Err(e) => {
-            error!("open: {:?}", e);
+        Err(_e) => {
+            #[cfg(any(feature = "log", feature = "defmt-03"))]
+            error!("open: {:?}", _e);
             -1
         }
     }
@@ -57,8 +58,9 @@ unsafe extern "C" fn file_read(data: *mut c_void, buf: *mut c_void, size: i32, o
     let mut read_buf = vec![0u8; size as usize];
     let len = match ctx.offset_read(&mut read_buf, offset as u64) {
         Ok(len) => len as i32,
-        Err(e) => {
-            error!("file_read: {:?}", e);
+        Err(_e) => {
+            #[cfg(any(feature = "log", feature = "defmt-03"))]
+            error!("file_read: {:?}", _e);
             -1
         }
     };
@@ -78,8 +80,9 @@ unsafe extern "C" fn file_write(
     core::ptr::copy_nonoverlapping(buf as *mut u8, write_buf.as_mut_ptr(), size as usize);
     match ctx.offset_write(&write_buf, offset as u64) {
         Ok(len) => len as i32,
-        Err(e) => {
-            error!("file_write: {:?}", e);
+        Err(_e) => {
+            #[cfg(any(feature = "log", feature = "defmt-03"))]
+            error!("file_write: {:?}", _e);
             -1
         }
     }
@@ -90,8 +93,9 @@ unsafe extern "C" fn file_close(data: *mut c_void) -> i32 {
     let ctx = ctx.as_mut().unwrap();
     match ctx.close() {
         Ok(_) => 0,
-        Err(e) => {
-            error!("file_close: {:?}", e);
+        Err(_e) => {
+            #[cfg(any(feature = "log", feature = "defmt-03"))]
+            error!("file_close: {:?}", _e);
             -1
         }
     }

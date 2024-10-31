@@ -227,6 +227,7 @@ impl core::str::FromStr for OsdpFlag {
     }
 }
 
+#[allow(dead_code)]
 fn cstr_to_string(s: *const ::core::ffi::c_char) -> String {
     let s = unsafe { core::ffi::CStr::from_ptr(s) };
     s.to_str().unwrap().to_owned()

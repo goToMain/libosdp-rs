@@ -13,13 +13,13 @@
 //! to the CP.
 
 use crate::{
-    Box, Channel, OsdpCommand, OsdpError, OsdpEvent, OsdpFileOps, PdCapability, PdInfo,
-    PdInfoBuilder,
+    Channel, OsdpCommand, OsdpError, OsdpEvent, OsdpFileOps, PdCapability, PdInfo, PdInfoBuilder,
 };
+use alloc::{boxed::Box, vec::Vec};
 use core::ffi::c_void;
 #[cfg(feature = "defmt-03")]
 use defmt::{debug, error, info, warn};
-#[cfg(not(feature = "defmt-03"))]
+#[cfg(all(feature = "log", not(feature = "defmt-03")))]
 use log::{debug, error, info, warn};
 
 type Result<T> = core::result::Result<T, OsdpError>;
@@ -27,24 +27,27 @@ type CommandCallback =
     unsafe extern "C" fn(data: *mut c_void, event: *mut libosdp_sys::osdp_cmd) -> i32;
 
 unsafe extern "C" fn log_handler(
-    log_level: ::core::ffi::c_int,
+    _log_level: ::core::ffi::c_int,
     _file: *const ::core::ffi::c_char,
     _line: ::core::ffi::c_ulong,
-    msg: *const ::core::ffi::c_char,
+    _msg: *const ::core::ffi::c_char,
 ) {
-    let msg = crate::cstr_to_string(msg);
-    let msg = msg.trim();
-    match log_level as libosdp_sys::osdp_log_level_e {
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_EMERG => error!("PD: {}", msg),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_ALERT => error!("PD: {}", msg),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_CRIT => error!("PD: {}", msg),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_ERROR => error!("PD: {}", msg),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_WARNING => warn!("PD: {}", msg),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_NOTICE => warn!("PD: {}", msg),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_INFO => info!("PD: {}", msg),
-        libosdp_sys::osdp_log_level_e_OSDP_LOG_DEBUG => debug!("PD: {}", msg),
-        _ => panic!("Unknown log level"),
-    };
+    #[cfg(any(feature = "log", feature = "defmt-03"))]
+    {
+        let msg = crate::cstr_to_string(_msg);
+        let msg = msg.trim();
+        match _log_level as libosdp_sys::osdp_log_level_e {
+            libosdp_sys::osdp_log_level_e_OSDP_LOG_EMERG => error!("PD: {}", msg),
+            libosdp_sys::osdp_log_level_e_OSDP_LOG_ALERT => error!("PD: {}", msg),
+            libosdp_sys::osdp_log_level_e_OSDP_LOG_CRIT => error!("PD: {}", msg),
+            libosdp_sys::osdp_log_level_e_OSDP_LOG_ERROR => error!("PD: {}", msg),
+            libosdp_sys::osdp_log_level_e_OSDP_LOG_WARNING => warn!("PD: {}", msg),
+            libosdp_sys::osdp_log_level_e_OSDP_LOG_NOTICE => warn!("PD: {}", msg),
+            libosdp_sys::osdp_log_level_e_OSDP_LOG_INFO => info!("PD: {}", msg),
+            libosdp_sys::osdp_log_level_e_OSDP_LOG_DEBUG => debug!("PD: {}", msg),
+            _ => panic!("Unknown log level"),
+        };
+    }
 }
 
 extern "C" fn trampoline<F>(data: *mut c_void, cmd: *mut libosdp_sys::osdp_cmd) -> i32
