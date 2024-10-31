@@ -28,7 +28,7 @@ pub enum OsdpCardFormats {
     Unspecified,
 
     /// Weigand format
-    Weigand,
+    Wiegand,
 
     /// Ascii format
     #[default]
@@ -42,7 +42,7 @@ impl From<libosdp_sys::osdp_event_cardread_format_e> for OsdpCardFormats {
                 OsdpCardFormats::Unspecified
             }
             libosdp_sys::osdp_event_cardread_format_e_OSDP_CARD_FMT_RAW_WIEGAND => {
-                OsdpCardFormats::Weigand
+                OsdpCardFormats::Wiegand
             }
             libosdp_sys::osdp_event_cardread_format_e_OSDP_CARD_FMT_ASCII => OsdpCardFormats::Ascii,
             _ => panic!("Unknown osdp card format"),
@@ -56,7 +56,7 @@ impl From<OsdpCardFormats> for libosdp_sys::osdp_event_cardread_format_e {
             OsdpCardFormats::Unspecified => {
                 libosdp_sys::osdp_event_cardread_format_e_OSDP_CARD_FMT_RAW_UNSPECIFIED
             }
-            OsdpCardFormats::Weigand => {
+            OsdpCardFormats::Wiegand => {
                 libosdp_sys::osdp_event_cardread_format_e_OSDP_CARD_FMT_RAW_WIEGAND
             }
             OsdpCardFormats::Ascii => libosdp_sys::osdp_event_cardread_format_e_OSDP_CARD_FMT_ASCII,
@@ -114,7 +114,7 @@ impl OsdpEventCardRead {
         }
         Ok(Self {
             reader_no: 0,
-            format: OsdpCardFormats::Weigand,
+            format: OsdpCardFormats::Wiegand,
             direction: false,
             nr_bits,
             data,
@@ -128,7 +128,7 @@ impl From<libosdp_sys::osdp_event_cardread> for OsdpEventCardRead {
         let format = value.format.into();
         let len = value.length as usize;
         let (nr_bits, nr_bytes) = match format {
-            OsdpCardFormats::Weigand => (len, (len + 7) / 8),
+            OsdpCardFormats::Wiegand => (len, (len + 7) / 8),
             _ => (0, len),
         };
         let data = value.data[0..nr_bytes].to_vec();
@@ -146,7 +146,7 @@ impl From<OsdpEventCardRead> for libosdp_sys::osdp_event_cardread {
     fn from(value: OsdpEventCardRead) -> Self {
         let mut data = [0; libosdp_sys::OSDP_EVENT_CARDREAD_MAX_DATALEN as usize];
         let length = match value.format {
-            OsdpCardFormats::Weigand => value.nr_bits as i32,
+            OsdpCardFormats::Wiegand => value.nr_bits as i32,
             _ => value.data.len() as i32,
         };
         data[..value.data.len()].copy_from_slice(&value.data[..]);
