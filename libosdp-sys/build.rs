@@ -162,11 +162,20 @@ fn main() -> Result<()> {
             .file("vendor/src/osdp_pcap.c");
     }
 
+    let short_enums = build.get_compiler().is_like_gnu() || build.get_compiler().is_like_clang();
+    if short_enums {
+        build.flag("-fshort-enums");
+    }
     build.compile("libosdp.a");
 
     /* generate bindings */
 
-    let args = vec![format!("-I{}", &out_dir)];
+    let mut args = vec![format!("-I{}", &out_dir)];
+    if short_enums {
+        args.push("-fshort-enums".to_owned());
+    } else {
+        args.push("-fno-short-enums".to_owned());
+    }
     let bindings = bindgen::Builder::default()
         .use_core()
         .header("vendor/include/osdp.h")
