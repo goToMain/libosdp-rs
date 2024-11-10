@@ -123,6 +123,12 @@ fn main() -> Result<()> {
         build = build.warnings_into_errors(true)
     }
 
+    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+    if target_os.is_empty() || target_os == "none" {
+        println!("cargo:warning=Building for bare metal target");
+        build = build.define("__BARE_METAL__", "1")
+    }
+
     let source_files = vec![
         "vendor/utils/src/list.c",
         "vendor/utils/src/queue.c",
