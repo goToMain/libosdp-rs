@@ -27,7 +27,7 @@ pub enum OsdpCardFormats {
     /// Card format is not specified
     Unspecified,
 
-    /// Weigand format
+    /// Wiegand format
     Wiegand,
 
     /// Ascii format
@@ -87,7 +87,7 @@ pub struct OsdpEventCardRead {
     pub direction: bool,
 
     /// Number of valid data bits in [`OsdpEventCardRead::data`] when the card
-    /// format is [`OsdpCardFormats::Weigand`]. For all other formats, this
+    /// format is [`OsdpCardFormats::Wiegand`]. For all other formats, this
     /// field is set to zero.
     pub nr_bits: usize,
 
@@ -107,8 +107,8 @@ impl OsdpEventCardRead {
         }
     }
 
-    /// Create a Weigand card read event for self and direction set to forward
-    pub fn new_weigand(nr_bits: usize, data: Vec<u8>) -> Result<Self> {
+    /// Create a Wiegand card read event for self and direction set to forward
+    pub fn new_wiegand(nr_bits: usize, data: Vec<u8>) -> Result<Self> {
         if nr_bits > data.len() * 8 {
             return Err(OsdpError::Command);
         }
@@ -449,7 +449,7 @@ mod tests {
 
         assert_eq!(event, event_struct.into());
 
-        let event = OsdpEventCardRead::new_weigand(15, vec![0x55, 0xAA]).unwrap();
+        let event = OsdpEventCardRead::new_wiegand(15, vec![0x55, 0xAA]).unwrap();
         let event_struct: osdp_event_cardread = event.clone().into();
 
         assert_eq!(event_struct.length, 15);
