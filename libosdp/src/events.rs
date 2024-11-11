@@ -87,7 +87,7 @@ pub struct OsdpEventCardRead {
     pub direction: bool,
 
     /// Number of valid data bits in [`OsdpEventCardRead::data`] when the card
-    /// format is [`OsdpCardFormats::Wiegand`]. For all other formats, this
+    /// format is not [`OsdpCardFormats::Ascii`]. For [`OsdpCardFormats::Ascii`], this
     /// field is set to zero.
     pub nr_bits: usize,
 
@@ -128,8 +128,8 @@ impl From<libosdp_sys::osdp_event_cardread> for OsdpEventCardRead {
         let format = value.format.into();
         let len = value.length as usize;
         let (nr_bits, nr_bytes) = match format {
-            OsdpCardFormats::Wiegand => (len, (len + 7) / 8),
-            _ => (0, len),
+            OsdpCardFormats::Ascii => (0, len),
+            _ => (len, len.div_ceil(8)),
         };
         let data = value.data[0..nr_bytes].to_vec();
         OsdpEventCardRead {
@@ -146,8 +146,8 @@ impl From<OsdpEventCardRead> for libosdp_sys::osdp_event_cardread {
     fn from(value: OsdpEventCardRead) -> Self {
         let mut data = [0; libosdp_sys::OSDP_EVENT_CARDREAD_MAX_DATALEN as usize];
         let length = match value.format {
-            OsdpCardFormats::Wiegand => value.nr_bits as i32,
-            _ => value.data.len() as i32,
+            OsdpCardFormats::Ascii => value.data.len() as i32,
+            _ => value.nr_bits as i32,
         };
         data[..value.data.len()].copy_from_slice(&value.data[..]);
         libosdp_sys::osdp_event_cardread {
