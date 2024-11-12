@@ -15,7 +15,7 @@ categories = ["development-tools", "embedded"]
 [dependencies]
 bitflags = "2.4.0"
 embedded-io = { version = "0.6.1", features = ["alloc"] }
-libosdp-sys = { path = "../libosdp-sys", default-features = false }
+libosdp-sys = "3.0.7"
 log = { version = "0.4.20", optional = true }
 serde = { version = "1.0.192", features = ["derive", "alloc"], default-features = false }
 thiserror = { version = "1.0.50", optional = true }
