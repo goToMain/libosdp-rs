@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 #  Copyright (c) 2024 Siddharth Chandrasekaran <sidcha.dev@gmail.com>
 #
