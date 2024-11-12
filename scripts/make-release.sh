@@ -45,7 +45,7 @@ function commit_release() {
 	version=$(perl -ne 'print $1 if (/^version = "(.+)"$/)' $crate/Cargo.toml)
 	git add $crate/Cargo.toml &&
 	git commit -s -m "$crate: Release v$version" &&
-	git tag "$crate-v$version" -a -m "Release $version"
+	git tag "$crate-v$version" -s -a -m "Release $version"
 }
 
 function do_cargo_release() {
@@ -56,7 +56,7 @@ function do_cargo_release() {
 }
 
 function do_libosdp_sys_bump() {
-	latest_release=$(curl -s https://api.github.com/repos/gotoMain/libosdp/releases/latest | jq -r .tag_name)
+	latest_release=$(curl -s https://api.github.com/repos/gotoMain/libosdp/releases/latest | grep 'tag_name' | perl -pe 's|\s+"tag_name": "(.+)",|$1|')
 	version=$(perl -ne 'print $1 if (/^version = "(.+)"$/)' libosdp-sys/Cargo.toml)
 	if [[ "${latest_release}" == "v${version}" ]]; then
 		echo "Nothing to be done"
