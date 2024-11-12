@@ -158,14 +158,14 @@ fn main() -> Result<()> {
         build = build
             .define("CONFIG_OSDP_PACKET_TRACE", "1")
             .file("vendor/utils/src/pcap_gen.c")
-            .file("vendor/src/osdp_pcap.c");
+            .file("vendor/src/osdp_diag.c");
     }
 
     if cfg!(feature = "data_trace") {
         build = build
             .define("CONFIG_OSDP_DATA_TRACE", "1")
             .file("vendor/utils/src/pcap_gen.c")
-            .file("vendor/src/osdp_pcap.c");
+            .file("vendor/src/osdp_diag.c");
     }
 
     let short_enums = build.get_compiler().is_like_gnu() || build.get_compiler().is_like_clang();
