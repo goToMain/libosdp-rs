@@ -91,7 +91,8 @@ fn osdpctl_config_dir() -> Result<PathBuf> {
 }
 
 fn device_runtime_dir() -> Result<PathBuf> {
-    let runtime_dir = dirs::runtime_dir().unwrap_or(PathBuf::from_str("/tmp")?);
+    let mut runtime_dir = dirs::runtime_dir().unwrap_or(PathBuf::from_str("/tmp")?);
+    runtime_dir.push("osdp");
     std::fs::create_dir_all(&runtime_dir)?;
     Ok(runtime_dir)
 }

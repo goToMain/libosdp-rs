@@ -27,7 +27,7 @@ fn setup(dev: &PdConfig, daemonize: bool) -> Result<()> {
     Ok(())
 }
 
-pub fn main(dev: PdConfig, daemonize: bool) -> Result<()> {
+pub fn main(mut dev: PdConfig, daemonize: bool) -> Result<()> {
     setup(&dev, daemonize)?;
     let (channel, pd_info) = dev.pd_info().context("Failed to create PD info")?;
     let mut pd = PeripheralDevice::new(pd_info, channel)?;

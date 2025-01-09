@@ -26,19 +26,23 @@ fn vec_to_array<T, const N: usize>(v: Vec<T>) -> [T; N] {
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct KeyStore {
     store: PathBuf,
+    pub key: [u8; 16],
 }
 
 impl KeyStore {
     pub fn create(store: PathBuf, key: &str) -> Result<Self> {
-        _ = KeyStore::str_to_key(key)?;
-        std::fs::write(&store, key)?;
-        Ok(Self { store })
+        let key = KeyStore::str_to_key(key)?;
+        std::fs::write(&store, key)
+            .expect("Unable to write to keystore");
+        Ok(Self { store, key })
     }
 
     pub fn _new(store: PathBuf) -> Result<Self> {
-        let key = KeyStore::key_to_str(&KeyStore::_random_key());
-        std::fs::write(&store, key)?;
-        Ok(Self { store })
+        let key = KeyStore::_random_key();
+        let key_str = KeyStore::key_to_str(&key);
+        std::fs::write(&store, key_str)
+            .expect("Unable to write to keystore");
+        Ok(Self { store, key })
     }
 
     pub fn _random_key() -> [u8; 16] {
@@ -68,16 +72,15 @@ impl KeyStore {
     }
 
     pub fn load(&self) -> Result<[u8; 16]> {
-        if !self.store.exists() {
-            anyhow::bail!("Store does not exist");
-        }
-        let s = std::fs::read_to_string(self.store.as_path())?;
-
+        let s = std::fs::read_to_string(&self.store)
+            .context(format!("keystore {} not found", self.store.display()))?;
         KeyStore::str_to_key(&s)
     }
 
-    pub fn store(&self, key: [u8; 16]) -> Result<()> {
-        std::fs::write(&self.store, KeyStore::key_to_str(&key))?;
+    pub fn store(&mut self, key: [u8; 16]) -> Result<()> {
+        std::fs::write(&self.store, KeyStore::key_to_str(&key))
+            .expect("Unable to write to keystore");
+        self.key = key;
         Ok(())
     }
 }
@@ -103,8 +106,7 @@ impl CpConfig {
     pub fn new(config: &Ini, runtime_dir: &Path) -> Result<Self> {
         let num_pd = config.getuint("default", "num_pd").unwrap().unwrap() as usize;
         let name = config.get("default", "name").unwrap();
-        let mut runtime_dir = runtime_dir.to_owned();
-        runtime_dir.push(&name);
+        let runtime_dir = runtime_dir.to_owned();
         let mut pd_data = Vec::new();
         for pd in 0..num_pd {
             let section = format!("pd-{pd}");
@@ -113,7 +115,7 @@ impl CpConfig {
                 name: config.get(&section, "name").unwrap(),
                 channel: config.get(&section, "channel").unwrap(),
                 address: config.getuint(&section, "address").unwrap().unwrap() as i32,
-                key_store: KeyStore::create(runtime_dir.join("key.store"), key)?,
+                key_store: KeyStore::create(runtime_dir.join(format!("pd-{}-key.store", pd)), key)?,
                 flags: OsdpFlag::empty(),
             });
         }
@@ -149,7 +151,7 @@ impl CpConfig {
                 .address(d.address)?
                 .baud_rate(115200)?
                 .flag(d.flags)
-                .secure_channel_key(d.key_store.load()?);
+                .secure_channel_key(d.key_store.key);
             cp = cp.add_channel(Box::new(channel), vec![pd_info]);
         }
         Ok(cp)
@@ -217,8 +219,7 @@ impl PdConfig {
         };
         let key = &config.get("default", "scbk").unwrap();
         let name = config.get("default", "name").unwrap();
-        let mut runtime_dir = runtime_dir.to_owned();
-        runtime_dir.push(&name);
+        let runtime_dir = runtime_dir.to_owned();
         let key_store = KeyStore::create(runtime_dir.join("key.store"), key)?;
         Ok(Self {
             name,
@@ -247,7 +248,7 @@ impl PdConfig {
             .flag(self.flags)
             .capabilities(&self.pd_cap)
             .id(&self.pd_id)
-            .secure_channel_key(self.key_store.load()?);
+            .secure_channel_key(self.key_store.key);
         Ok((Box::new(channel), pd_info))
     }
 }
@@ -287,9 +288,15 @@ impl DeviceConfig {
             bail!("Config {} does not exist!", cfg.display())
         }
         config.load(cfg).unwrap();
+
+        let mut runtime_dir = runtime_dir.to_owned();
+        let name = config.get("default", "name").unwrap();
+        runtime_dir.push(&name);
+        _ = std::fs::create_dir_all(&runtime_dir);
+
         let config = match config.get("default", "num_pd") {
-            Some(_) => DeviceConfig::CpConfig(CpConfig::new(&config, runtime_dir)?),
-            None => DeviceConfig::PdConfig(PdConfig::new(&config, runtime_dir)?),
+            Some(_) => DeviceConfig::CpConfig(CpConfig::new(&config, &runtime_dir)?),
+            None => DeviceConfig::PdConfig(PdConfig::new(&config, &runtime_dir)?),
         };
         Ok(config)
     }
