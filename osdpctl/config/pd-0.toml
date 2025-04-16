@@ -1,0 +1,16 @@
+name = "pd0"
+address = 1
+channel = "unix::conn-pd0"
+scbk = "737dcd99395a0d92ea3d56cb67549df4"
+flags = [ "InstallMode" ]
+log_level = "INFO"
+
+[capability]
+CommunicationSecurity = { Compliance = 1, NumItems = 1}
+
+[pd_id]
+model = 1
+version = 1
+vendor_code = [ 0x01, 0x02, 0x03 ]
+serial_number = [ 0x01, 0x02, 0x03, 0x04 ]
+firmware_version = [ 0x01, 0x02, 0x03 ]

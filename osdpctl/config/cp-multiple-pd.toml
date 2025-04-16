@@ -1,0 +1,14 @@
+name = "multi_cp"
+log_level = "INFO"
+
+[[PD]]
+name = "pd0"
+address = 1
+channel = { type = "unix", path = "conn-pd0" }
+scbk = "737dcd99395a0d92ea3d56cb67549df4"
+
+[[PD]]
+name = "pd1"
+address = 2
+channel = { type = "serial", path = "/dev/ttyUSB0", speed = 9600 }
+scbk = "2a2ec2e2ab95345eaa80577948daf5bb"

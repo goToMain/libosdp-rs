@@ -5,14 +5,16 @@
 
 use std::{thread, time::Duration};
 
-use crate::config::PdConfig;
 use anyhow::Context;
-use libosdp::{OsdpCommand, PeripheralDevice};
+use libosdp::{Channel, OsdpCommand, OsdpFlag, PdCapEntity, PdCapability, PdInfoBuilder, PeripheralDevice};
 use std::io::Write;
+use crate::channel::serial::SerialChannel;
+use crate::channel::unix::UnixChannel;
+use crate::config::{ChannelInfo, PDConfig};
 
 type Result<T> = anyhow::Result<T, anyhow::Error>;
 
-fn setup(dev: &PdConfig, daemonize: bool) -> Result<()> {
+fn setup(dev: &PDConfig, daemonize: bool) -> Result<()> {
     if dev.runtime_dir.exists() {
         std::fs::remove_dir_all(&dev.runtime_dir)?;
     }
@@ -27,9 +29,22 @@ fn setup(dev: &PdConfig, daemonize: bool) -> Result<()> {
     Ok(())
 }
 
-pub fn main(mut dev: PdConfig, daemonize: bool) -> Result<()> {
-    setup(&dev, daemonize)?;
-    let (channel, pd_info) = dev.pd_info().context("Failed to create PD info")?;
+pub fn main(config: PDConfig, daemonize: bool) -> Result<()> {
+    setup(&config, daemonize)?;
+    let channel: Box<dyn Channel> = match config.channel {
+        ChannelInfo::Serial(port,speed) => Box::new(SerialChannel::open(&port, speed)?),
+        ChannelInfo::Unix(path) => Box::new(UnixChannel::connect(&path)?),
+    };
+    let pd_info = PdInfoBuilder::new()
+        .name(&config.name)?
+        .address(config.address)?
+        .baud_rate()?
+        .flag(OsdpFlag::EnforceSecure)
+        .capability(PdCapability::CommunicationSecurity(PdCapEntity::new(1, 1)))
+        .secure_channel_key(config.scbk);
+    let mut pd = libosdp::PeripheralDevice::new(pd_info, channel)?;
+    
+    let (channel, pd_info) = config.pd_info().context("Failed to create PD info")?;
     let mut pd = PeripheralDevice::new(pd_info, channel)?;
     pd.set_command_callback(|command| {
         match command {
@@ -52,7 +67,7 @@ pub fn main(mut dev: PdConfig, daemonize: bool) -> Result<()> {
                 log::info!("Command: {:?}", c);
                 let mut key = [0; 16];
                 key.copy_from_slice(&c.data[0..16]);
-                dev.key_store.store(key).unwrap();
+                config.key_store.store(key).unwrap();
             }
             OsdpCommand::Mfg(c) => {
                 log::info!("Command: {:?}", c);

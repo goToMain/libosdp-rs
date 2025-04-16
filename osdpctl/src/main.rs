@@ -3,15 +3,15 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-mod config;
 mod cp;
 mod daemonize;
 mod pd;
-mod unix_channel;
+mod config;
+mod keystore;
+mod channel;
 
 use anyhow::{bail, Context};
 use clap::{arg, Command};
-use config::DeviceConfig;
 use log::LevelFilter;
 use log4rs::{
     append::console::ConsoleAppender,
@@ -23,6 +23,8 @@ use nix::{
     unistd::Pid,
 };
 use std::{path::PathBuf, str::FromStr};
+use crate::config::DeviceConfig;
+
 type Result<T> = anyhow::Result<T, anyhow::Error>;
 
 const HELP_TEMPLATE: &str = "{before-help}
@@ -136,7 +138,7 @@ fn main() -> Result<()> {
                     dev.name()
                 );
             }
-            std::fs::copy(&config, &dest_path).unwrap();
+            std::fs::copy(&config, &dest_path)?;
             println!("Created new device '{}'.", dev.name())
         }
         Some(("destroy", sub_matches)) => {
@@ -151,15 +153,15 @@ fn main() -> Result<()> {
             if sock.exists() {
                 bail!("Device '{name}' is still running; stop it first.");
             }
-            std::fs::remove_file(config_path).unwrap();
+            std::fs::remove_file(config_path)?;
             println!("Destroyed device '{name}'.")
         }
         Some(("list", _)) => {
-            let paths = std::fs::read_dir(&cfg_dir).unwrap();
+            let paths = std::fs::read_dir(&cfg_dir)?;
             println!("  Nr  Device Name     Status   ");
             println!("-------------------------------");
             for (i, path) in paths.enumerate() {
-                let path = path.unwrap().path();
+                let path = path?.path();
                 if let Some(ext) = path.extension() {
                     if ext == "cfg" {
                         let dev = DeviceConfig::new(&path, &rt_dir)?;
@@ -176,11 +178,11 @@ fn main() -> Result<()> {
             let config_path = cfg_dir.join(format!("{name}.cfg"));
             let dev = DeviceConfig::new(&config_path, &rt_dir)?;
             match dev {
-                DeviceConfig::CpConfig(dev) => {
+                DeviceConfig::ControlPanel(dev) => {
                     lh.set_config(get_logger_config(dev.log_level)?);
                     cp::main(dev, daemonize)?;
                 }
-                DeviceConfig::PdConfig(dev) => {
+                DeviceConfig::PeripheralDevice(dev) => {
                     lh.set_config(get_logger_config(dev.log_level)?);
                     pd::main(dev, daemonize)?;
                 }
@@ -193,7 +195,7 @@ fn main() -> Result<()> {
             let config_path = cfg_dir.join(format!("{name}.cfg"));
             let dev = DeviceConfig::new(&config_path, &rt_dir)?;
             let pid = dev.get_pid()?;
-            signal::kill(Pid::from_raw(pid), Signal::SIGHUP)
+            signal::kill(Pid::from_raw(pid.as_raw()), Signal::SIGHUP)
                 .context("Failed to stop to requested device")?;
             println!("Device `{}` stopped", dev.name());
         }

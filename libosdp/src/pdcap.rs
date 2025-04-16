@@ -137,59 +137,52 @@ pub enum PdCapability {
     Biometrics(PdCapEntity),
 }
 
-#[rustfmt::skip]
-impl FromStr for PdCapability {
-    type Err = OsdpError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if let Some((cap, ent)) = s.split_once(':') {
-            match cap {
-                "ContactStatusMonitoring" => {
-                    Ok(PdCapability::ContactStatusMonitoring(PdCapEntity::from_str(ent)?))
-                },
-                "OutputControl" => {
-                    Ok(PdCapability::OutputControl(PdCapEntity::from_str(ent)?))
-                },
-                "CardDataFormat" => {
-                    Ok(PdCapability::CardDataFormat(PdCapEntity::from_str(ent)?))
-                },
-                "LedControl" => {
-                    Ok(PdCapability::LedControl(PdCapEntity::from_str(ent)?))
-                },
-                "AudibleOutput" => {
-                    Ok(PdCapability::AudibleOutput(PdCapEntity::from_str(ent)?))
-                },
-                "TextOutput" => {
-                    Ok(PdCapability::TextOutput(PdCapEntity::from_str(ent)?))
-                },
-                "TimeKeeping" => {
-                    Ok(PdCapability::TimeKeeping(PdCapEntity::from_str(ent)?))
-                },
-                "CheckCharacterSupport" => {
-                    Ok(PdCapability::CheckCharacterSupport(PdCapEntity::from_str(ent)?))
-                },
-                "CommunicationSecurity" => {
-                    Ok(PdCapability::CommunicationSecurity(PdCapEntity::from_str(ent)?))
-                },
-                "ReceiveBufferSize" => {
-                    Ok(PdCapability::ReceiveBufferSize(PdCapEntity::from_str(ent)?))
-                }
-                "LargestCombinedMessage" => {
-                    Ok(PdCapability::LargestCombinedMessage(PdCapEntity::from_str(ent)?))
-                },
-                "SmartCardSupport" => {
-                    Ok(PdCapability::SmartCardSupport(PdCapEntity::from_str(ent)?))
-                },
-                "Readers" => {
-                    Ok(PdCapability::Readers(PdCapEntity::from_str(ent)?))
-                },
-                "Biometrics" => {
-                    Ok(PdCapability::Biometrics(PdCapEntity::from_str(ent)?))
-                },
-                _ => Err(OsdpError::Parse(format!("PdCapability: {s}"))),
+impl PdCapability {
+    pub fn from_str(cap: &str, ent: PdCapEntity) -> Result<Self, OsdpError> {
+        match cap {
+            "ContactStatusMonitoring" => {
+                Ok(PdCapability::ContactStatusMonitoring(ent))
+            },
+            "OutputControl" => {
+                Ok(PdCapability::OutputControl(ent))
+            },
+            "CardDataFormat" => {
+                Ok(PdCapability::CardDataFormat(ent))
+            },
+            "LedControl" => {
+                Ok(PdCapability::LedControl(ent))
+            },
+            "AudibleOutput" => {
+                Ok(PdCapability::AudibleOutput(ent))
+            },
+            "TextOutput" => {
+                Ok(PdCapability::TextOutput(ent))
+            },
+            "TimeKeeping" => {
+                Ok(PdCapability::TimeKeeping(ent))
+            },
+            "CheckCharacterSupport" => {
+                Ok(PdCapability::CheckCharacterSupport(ent))
+            },
+            "CommunicationSecurity" => {
+                Ok(PdCapability::CommunicationSecurity(ent))
+            },
+            "ReceiveBufferSize" => {
+                Ok(PdCapability::ReceiveBufferSize(ent))
             }
-        } else {
-            Err(OsdpError::Parse(format!("PdCapability: {s}")))
+            "LargestCombinedMessage" => {
+                Ok(PdCapability::LargestCombinedMessage(ent))
+            },
+            "SmartCardSupport" => {
+                Ok(PdCapability::SmartCardSupport(ent))
+            },
+            "Readers" => {
+                Ok(PdCapability::Readers(ent))
+            },
+            "Biometrics" => {
+                Ok(PdCapability::Biometrics(ent))
+            },
+            _ => Err(OsdpError::Parse(format!("PdCapability: {cap}"))),
         }
     }
 }
