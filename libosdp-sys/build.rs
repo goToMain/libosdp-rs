@@ -127,6 +127,15 @@ fn main() -> Result<()> {
     if target_os.is_empty() || target_os == "none" {
         println!("cargo:warning=Building for bare metal target");
         build = build.define("__BARE_METAL__", "1")
+    } else if target_os == "espidf" {
+        // ESP-IDF provides a POSIX-compatible environment (sys/time.h,
+        // gettimeofday, etc.).  The libosdp C code's __linux__ code path
+        // is compatible with ESP-IDF, so we reuse it here.
+        println!("cargo:warning=Building for ESP-IDF target (POSIX-compatible)");
+        build = build.define("__linux__", "1");
+        // ESP-IDF headers may trigger warnings that are not actionable
+        // when cross-compiling, so relax -Werror for this target.
+        build = build.warnings_into_errors(false);
     }
 
     let source_files = vec![
