@@ -9,4 +9,5 @@
 #![allow(missing_docs)]
 #![allow(unused)]
 
-core::include!(core::concat!(core::env!("OUT_DIR"), "/bindings.rs"));
+mod bindings;
+pub use bindings::*;

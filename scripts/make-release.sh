@@ -67,7 +67,10 @@ function do_libosdp_sys_bump() {
 	git checkout ${latest_release}
 	git submodule update --recursive
 	popd
+	cargo clean -p libosdp-sys
+	CCACHE_DISABLE=1 LIBOSDP_SYS_REGENERATE_BINDINGS=1 cargo build -p libosdp-sys
 	git add libosdp-sys/vendor
+	git add libosdp-sys/src/bindings.rs
 	cargo_set_version libosdp-sys ${latest_release#"v"}
 	commit_release libosdp-sys
 }
@@ -95,4 +98,3 @@ while [ $# -gt 0 ]; do
 done
 
 do_release $CRATE $INC
-

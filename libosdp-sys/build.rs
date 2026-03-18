@@ -2,7 +2,7 @@ use anyhow::Context;
 use build_target::Os;
 use std::{
     borrow::BorrowMut,
-    path::{Path, PathBuf},
+    path::Path,
     process::Command,
 };
 type Result<T> = anyhow::Result<T, anyhow::Error>;
@@ -103,6 +103,11 @@ fn generate_osdp_build_headers(out_dir: &str) -> Result<()> {
 
 fn main() -> Result<()> {
     let out_dir = std::env::var("OUT_DIR").unwrap();
+    println!("cargo:rerun-if-env-changed=LIBOSDP_SYS_REGENERATE_BINDINGS");
+    println!("cargo:rerun-if-changed=vendor/include/osdp.h");
+    println!("cargo:rerun-if-changed=vendor/src");
+    println!("cargo:rerun-if-changed=vendor/utils/src");
+    println!("cargo:rerun-if-changed=vendor/utils/include");
 
     generate_osdp_build_headers(&out_dir)?;
 
@@ -184,23 +189,31 @@ fn main() -> Result<()> {
     }
     build.compile("libosdp.a");
 
-    /* generate bindings */
+    /* regenerate bindings only when requested by maintainer */
+    if std::env::var("LIBOSDP_SYS_REGENERATE_BINDINGS").as_deref() == Ok("1") {
+        let mut args = vec![format!("-I{}", &out_dir)];
+        if short_enums {
+            args.push("-fshort-enums".to_owned());
+        } else {
+            args.push("-fno-short-enums".to_owned());
+        }
+        let bindings = bindgen::Builder::default()
+            .use_core()
+            .header("vendor/include/osdp.h")
+            .clang_args(args)
+            .generate()
+            .context("Unable to generate bindings")?;
 
-    let mut args = vec![format!("-I{}", &out_dir)];
-    if short_enums {
-        args.push("-fshort-enums".to_owned());
-    } else {
-        args.push("-fno-short-enums".to_owned());
+        let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+        let bindings_path = Path::new(&manifest_dir).join("src/bindings.rs");
+        bindings
+            .write_to_file(&bindings_path)
+            .context("Couldn't write checked-in bindings")?;
+        println!(
+            "cargo:warning=Regenerated checked-in bindings at {}",
+            bindings_path.display()
+        );
     }
-    let bindings = bindgen::Builder::default()
-        .use_core()
-        .header("vendor/include/osdp.h")
-        .clang_args(args)
-        .generate()
-        .context("Unable to generate bindings")?;
 
-    let out_path = PathBuf::from(out_dir);
-    bindings
-        .write_to_file(out_path.join("bindings.rs"))
-        .context("Couldn't write bindings!")
+    Ok(())
 }
