@@ -192,14 +192,17 @@ fn main() -> Result<()> {
     /* regenerate bindings only when requested by maintainer */
     if std::env::var("LIBOSDP_SYS_REGENERATE_BINDINGS").as_deref() == Ok("1") {
         let mut args = vec![format!("-I{}", &out_dir)];
+        let target = std::env::var("TARGET").unwrap();
+        args.push(format!("--target={target}"));
         if short_enums {
             args.push("-fshort-enums".to_owned());
         } else {
             args.push("-fno-short-enums".to_owned());
         }
+        let layout_tests = std::env::var("LIBOSDP_SYS_BINDGEN_LAYOUT_TESTS").as_deref() == Ok("1");
         let bindings = bindgen::Builder::default()
             .use_core()
-            .layout_tests(false)
+            .layout_tests(layout_tests)
             .header("vendor/include/osdp.h")
             .clang_args(args)
             .generate()

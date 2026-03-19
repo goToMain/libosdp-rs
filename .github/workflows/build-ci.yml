@@ -32,6 +32,32 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi
       - name: Cargo check no-std
         run: cargo check --package libosdp --target thumbv6m-none-eabi --no-default-features
+
+  bindings-check:
+    name: Regenerate bindings and check on ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [x86_64-unknown-linux-gnu, thumbv6m-none-eabi]
+    env:
+      LIBOSDP_SYS_REGENERATE_BINDINGS: "1"
+      LIBOSDP_SYS_BINDGEN_LAYOUT_TESTS: "1"
+      CCACHE_DISABLE: "1"
+    steps:
+      - name: checkout
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+      - name: Setup rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1.9.0
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+      - name: Install gcc-arm-none-eabi
+        if: matrix.target == 'thumbv6m-none-eabi'
+        run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi
+      - name: Regenerate bindings and cargo check
+        run: cargo check -p libosdp-sys --target ${{ matrix.target }}
   test:
     runs-on: ubuntu-latest
     steps:

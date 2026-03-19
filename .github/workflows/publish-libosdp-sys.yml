@@ -14,8 +14,27 @@ on:
     - 'libosdp-sys-v*'
 
 jobs:
+  bindings_match:
+    name: Verify checked-in bindings
+    runs-on: ubuntu-latest
+    env:
+      CCACHE_DISABLE: "1"
+      LIBOSDP_SYS_REGENERATE_BINDINGS: "1"
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        submodules: recursive
+    - uses: actions-rust-lang/setup-rust-toolchain@v1.9.0
+      with:
+        toolchain: stable
+    - name: Regenerate bindings
+      run: cargo build -p libosdp-sys
+    - name: Check bindings are committed
+      run: git diff --exit-code -- libosdp-sys/src/bindings.rs
+
   cross_platform_check:
     name: Build crate on ${{ matrix.os }}
+    needs: [bindings_match]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -31,7 +50,7 @@ jobs:
 
   publish:
     name: Publish Crate
-    needs: [cross_platform_check]
+    needs: [bindings_match, cross_platform_check]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
