@@ -52,7 +52,7 @@
 //!
 //! You can find a template implementation for CP app [here][3] and PD app [here][4].
 //!
-//! [1]: https://libosdp.sidcha.dev/protocol/
+//! [1]: https://doc.osdp.dev/protocol/
 //! [2]: https://www.securityindustry.org/industry-standards/open-supervised-device-protocol/
 //! [3]: https://docs.rs/crate/libosdp/latest/source/examples/cp.rs
 //! [4]: https://docs.rs/crate/libosdp/latest/source/examples/pd.rs

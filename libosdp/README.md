@@ -3,7 +3,7 @@
 This crate provides safe wrappers for accessing the C library [LibOSDP][1].
 LibOSDP the most popular open source library for creating Open Supervised Device
 Protocol (OSDP) devices. For more information about the library or OSDP in
-general, see [libosdp.sidcha.dev][4].
+general, see [doc.osdp.dev][4].
 
 The documentation for this crate can be found [here][5].
 
@@ -60,6 +60,6 @@ See [examples][2] for a working implementation.
 
 [1]: https://github.cobm/goToMain/liosdp
 [2]: https://github.com/goToMain/libosdp-rs/tree/master/libosdp/examples
-[3]: https://libosdp.sidcha.dev/protocol/commands-and-replies
-[4]: https://libosdp.sidcha.dev/
+[3]: https://doc.osdp.dev/protocol/commands-and-replies
+[4]: https://doc.osdp.dev/
 [5]: https://docs.rs/libosdp

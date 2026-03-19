@@ -17,7 +17,7 @@ and other OSDP related tools such as osdpctl. You can also take a look at the
 - `scripts` - Tools for developers working on this project.
 
 [1]: https://github.com/goToMain/libosdp
-[2]: https://libosdp.sidcha.dev/
+[2]: https://doc.osdp.dev/
 [3]: https://img.shields.io/crates/v/libosdp-sys?style=flat&logo=rust&logoColor=DDD&label=crate%20%3A%20libosdp-sys&link=https%3A%2F%2Fcrates.io%2Fcrates%2Flibosdp-sys
 [4]: https://crates.io/crates/libosdp-sys
 [5]: https://img.shields.io/crates/v/libosdp?style=flat&logo=rust&logoColor=DDD&label=crate%20%3A%20libosdp&link=https%3A%2F%2Fcrates.io%2Fcrates%2Flibosdp
