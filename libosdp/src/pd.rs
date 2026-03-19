@@ -54,12 +54,12 @@ extern "C" fn trampoline<F>(data_ptr: *mut c_void, cmd_ptr: *mut libosdp_sys::os
 where
     F: FnMut(&mut OsdpCommand) -> i32,
 {
-    match unsafe { cmd_ptr.read().try_into() } {
+    match unsafe { core::ptr::read_unaligned(cmd_ptr).try_into() } {
         Ok(mut cmd) => {
             let callback: &mut F = unsafe { &mut *(data_ptr as *mut F) };
             let res = callback(&mut cmd);
             unsafe {
-                cmd_ptr.write(cmd.into());
+                core::ptr::write_unaligned(cmd_ptr, cmd.into());
             }
             res
         },

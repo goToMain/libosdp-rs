@@ -47,7 +47,7 @@ extern "C" fn trampoline<F>(data: *mut c_void, pd: i32, event: *mut libosdp_sys:
 where
     F: FnMut(i32, OsdpEvent) -> i32,
 {
-    match unsafe { (*event).try_into() } {
+    match unsafe { core::ptr::read_unaligned(event).try_into() } {
         Ok(event) => {
             let callback: &mut F = unsafe { &mut *(data as *mut F) };
             callback(pd, event)
