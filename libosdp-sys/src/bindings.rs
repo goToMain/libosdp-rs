@@ -338,6 +338,14 @@ pub type osdp_read_fn_t = ::core::option::Option<
         maxlen: ::core::ffi::c_int,
     ) -> ::core::ffi::c_int,
 >;
+#[doc = " @brief Pointer to function used to receive a full packet buffer.\n The callee returns a pointer and a max_len up to which LibOSDP may\n access the buffer. The caller must invoke release_pkt() when done.\n\n @param data for use by underlying layers. osdp_channel::data is passed\n @param buf output pointer to the packet buffer\n @param max_len output maximum length LibOSDP may touch in this buffer\n @return 0 when a complete packet is available; non-zero otherwise"]
+pub type osdp_read_pkt_fn_t = ::core::option::Option<
+    unsafe extern "C" fn(
+        data: *mut ::core::ffi::c_void,
+        buf: *mut *const u8,
+        max_len: *mut ::core::ffi::c_int,
+    ) -> ::core::ffi::c_int,
+>;
 #[doc = " @brief pointer to function that sends byte array into some channel. This\n function should be non-blocking.\n\n @param data for use by underlying layers. osdp_channel::data is passed\n @param buf byte array to be sent\n @param len number of bytes in `buf`\n\n @retval +ve: number of bytes sent. must be <= `len`\n @retval -ve on errors\n\n @note For now, LibOSDP expects method to write/queue all or no bytes over\n the channel per-invocation; ie., it does not support partial writes and is a\n known limitation. Since an OSDP packet isn't so large, and typical TX\n buffers are much larger than that, it's not as bad as it sounds and hence\n not on the priority list to be fixed."]
 pub type osdp_write_fn_t = ::core::option::Option<
     unsafe extern "C" fn(
@@ -352,6 +360,9 @@ pub type osdp_flush_fn_t =
 #[doc = " @brief pointer to function that closes the underlying channel. This call is\n made when LibOSDP is terminating, once per PD.\n\n @param data for use by underlying layers. osdp_channel::data is passed"]
 pub type osdp_close_fn_t =
     ::core::option::Option<unsafe extern "C" fn(data: *mut ::core::ffi::c_void)>;
+#[doc = " @brief Pointer to function used to release a buffer returned by recv_pkt().\n\n @param data for use by underlying layers. osdp_channel::data is passed\n @param buf pointer that was returned by recv_pkt()"]
+pub type osdp_release_pkt_fn_t =
+    ::core::option::Option<unsafe extern "C" fn(data: *mut ::core::ffi::c_void, buf: *const u8)>;
 #[doc = " @brief User defined communication channel abstraction for OSDP devices.\n The methods for read/write/flush are expected to be non-blocking."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -362,25 +373,33 @@ pub struct osdp_channel {
     pub id: ::core::ffi::c_int,
     #[doc = " Pointer to function used to receive osdp packet data"]
     pub recv: osdp_read_fn_t,
+    #[doc = " Pointer to function used to receive a full packet buffer (optional)"]
+    pub recv_pkt: osdp_read_pkt_fn_t,
     #[doc = " Pointer to function used to send osdp packet data"]
     pub send: osdp_write_fn_t,
     #[doc = " Pointer to function used to flush the channel (optional)"]
     pub flush: osdp_flush_fn_t,
+    #[doc = " Pointer to function used to release recv_pkt() data (optional)"]
+    pub release_pkt: osdp_release_pkt_fn_t,
     #[doc = " Pointer to function used to close the channel (optional)"]
     pub close: osdp_close_fn_t,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of osdp_channel"][::core::mem::size_of::<osdp_channel>() - 48usize];
+    ["Size of osdp_channel"][::core::mem::size_of::<osdp_channel>() - 64usize];
     ["Alignment of osdp_channel"][::core::mem::align_of::<osdp_channel>() - 8usize];
     ["Offset of field: osdp_channel::data"][::core::mem::offset_of!(osdp_channel, data) - 0usize];
     ["Offset of field: osdp_channel::id"][::core::mem::offset_of!(osdp_channel, id) - 8usize];
     ["Offset of field: osdp_channel::recv"][::core::mem::offset_of!(osdp_channel, recv) - 16usize];
-    ["Offset of field: osdp_channel::send"][::core::mem::offset_of!(osdp_channel, send) - 24usize];
+    ["Offset of field: osdp_channel::recv_pkt"]
+        [::core::mem::offset_of!(osdp_channel, recv_pkt) - 24usize];
+    ["Offset of field: osdp_channel::send"][::core::mem::offset_of!(osdp_channel, send) - 32usize];
     ["Offset of field: osdp_channel::flush"]
-        [::core::mem::offset_of!(osdp_channel, flush) - 32usize];
+        [::core::mem::offset_of!(osdp_channel, flush) - 40usize];
+    ["Offset of field: osdp_channel::release_pkt"]
+        [::core::mem::offset_of!(osdp_channel, release_pkt) - 48usize];
     ["Offset of field: osdp_channel::close"]
-        [::core::mem::offset_of!(osdp_channel, close) - 40usize];
+        [::core::mem::offset_of!(osdp_channel, close) - 56usize];
 };
 #[doc = " @brief OSDP PD Information. This struct is used to describe a PD to LibOSDP."]
 #[repr(C)]
@@ -405,7 +424,7 @@ pub struct osdp_pd_info_t {
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of osdp_pd_info_t"][::core::mem::size_of::<osdp_pd_info_t>() - 104usize];
+    ["Size of osdp_pd_info_t"][::core::mem::size_of::<osdp_pd_info_t>() - 120usize];
     ["Alignment of osdp_pd_info_t"][::core::mem::align_of::<osdp_pd_info_t>() - 8usize];
     ["Offset of field: osdp_pd_info_t::name"]
         [::core::mem::offset_of!(osdp_pd_info_t, name) - 0usize];
@@ -421,7 +440,7 @@ const _: () = {
     ["Offset of field: osdp_pd_info_t::channel"]
         [::core::mem::offset_of!(osdp_pd_info_t, channel) - 48usize];
     ["Offset of field: osdp_pd_info_t::scbk"]
-        [::core::mem::offset_of!(osdp_pd_info_t, scbk) - 96usize];
+        [::core::mem::offset_of!(osdp_pd_info_t, scbk) - 112usize];
 };
 #[doc = " @brief To keep the OSDP internal data structures from polluting the exposed\n headers, they are typedefed to void before sending them to the upper layers.\n This level of abstraction looked reasonable as _technically_ no one should\n attempt to modify it outside of the LibOSDP and their definition may change\n at any time."]
 pub type osdp_t = ::core::ffi::c_void;
@@ -729,10 +748,29 @@ pub const osdp_cmd_e_OSDP_CMD_COMSET_DONE: osdp_cmd_e = 10;
 pub const osdp_cmd_e_OSDP_CMD_SENTINEL: osdp_cmd_e = 11;
 #[doc = " @brief OSDP application exposed commands"]
 pub type osdp_cmd_e = ::core::ffi::c_uchar;
+#[doc = " @brief Queue linkage node; layout-compatible with node_t from list.h.\n Embedded as @c _node in osdp_cmd and osdp_event. Do not read or write this\n field — it is reserved for internal use by the library."]
+pub type osdp_queue_node_t = osdp_queue_node_s;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct osdp_queue_node_s {
+    pub next: *mut osdp_queue_node_t,
+    pub prev: *mut osdp_queue_node_t,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of osdp_queue_node_s"][::core::mem::size_of::<osdp_queue_node_s>() - 16usize];
+    ["Alignment of osdp_queue_node_s"][::core::mem::align_of::<osdp_queue_node_s>() - 8usize];
+    ["Offset of field: osdp_queue_node_s::next"]
+        [::core::mem::offset_of!(osdp_queue_node_s, next) - 0usize];
+    ["Offset of field: osdp_queue_node_s::prev"]
+        [::core::mem::offset_of!(osdp_queue_node_s, prev) - 8usize];
+};
 #[doc = " @brief OSDP Command Structure. This is a wrapper for all individual OSDP\n commands."]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct osdp_cmd {
+    #[doc = "< Reserved: internal queue linkage"]
+    pub _node: osdp_queue_node_t,
     #[doc = "< Command ID. Used to select specific commands in union"]
     pub id: osdp_cmd_e,
     #[doc = "< Flags; see OSDP_CMD_FLAG_* flags for possibilities"]
@@ -788,10 +826,11 @@ const _: () = {
 };
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of osdp_cmd"][::core::mem::size_of::<osdp_cmd>() - 80usize];
-    ["Alignment of osdp_cmd"][::core::mem::align_of::<osdp_cmd>() - 4usize];
-    ["Offset of field: osdp_cmd::id"][::core::mem::offset_of!(osdp_cmd, id) - 0usize];
-    ["Offset of field: osdp_cmd::flags"][::core::mem::offset_of!(osdp_cmd, flags) - 4usize];
+    ["Size of osdp_cmd"][::core::mem::size_of::<osdp_cmd>() - 96usize];
+    ["Alignment of osdp_cmd"][::core::mem::align_of::<osdp_cmd>() - 8usize];
+    ["Offset of field: osdp_cmd::_node"][::core::mem::offset_of!(osdp_cmd, _node) - 0usize];
+    ["Offset of field: osdp_cmd::id"][::core::mem::offset_of!(osdp_cmd, id) - 16usize];
+    ["Offset of field: osdp_cmd::flags"][::core::mem::offset_of!(osdp_cmd, flags) - 20usize];
 };
 #[doc = "< Unspecified card format"]
 pub const osdp_event_cardread_format_e_OSDP_CARD_FMT_RAW_UNSPECIFIED: osdp_event_cardread_format_e =
@@ -931,6 +970,8 @@ pub type osdp_event_type = ::core::ffi::c_uchar;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct osdp_event {
+    #[doc = "< Reserved: internal queue linkage"]
+    pub _node: osdp_queue_node_t,
     #[doc = "< Event type. Used to select specific event in union"]
     pub type_: osdp_event_type,
     #[doc = "< Flags; reserved, set to zero"]
@@ -971,10 +1012,11 @@ const _: () = {
 };
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of osdp_event"][::core::mem::size_of::<osdp_event>() - 144usize];
-    ["Alignment of osdp_event"][::core::mem::align_of::<osdp_event>() - 4usize];
-    ["Offset of field: osdp_event::type_"][::core::mem::offset_of!(osdp_event, type_) - 0usize];
-    ["Offset of field: osdp_event::flags"][::core::mem::offset_of!(osdp_event, flags) - 4usize];
+    ["Size of osdp_event"][::core::mem::size_of::<osdp_event>() - 160usize];
+    ["Alignment of osdp_event"][::core::mem::align_of::<osdp_event>() - 8usize];
+    ["Offset of field: osdp_event::_node"][::core::mem::offset_of!(osdp_event, _node) - 0usize];
+    ["Offset of field: osdp_event::type_"][::core::mem::offset_of!(osdp_event, type_) - 16usize];
+    ["Offset of field: osdp_event::flags"][::core::mem::offset_of!(osdp_event, flags) - 20usize];
 };
 #[doc = " @brief Callback for PD command notifications. After it has been registered\n with `osdp_pd_set_command_callback`, this method is invoked when the PD\n receives a command from the CP.\n\n @param arg pointer that will was passed to the arg param of\n `osdp_pd_set_command_callback`.\n @param cmd pointer to the received command.\n\n @retval 0 if LibOSDP must send a `osdp_ACK` response\n @retval -ve if LibOSDP must send a `osdp_NAK` response\n @retval +ve and modify the passed `struct osdp_cmd *cmd` if LibOSDP must\n send a specific response. This is useful for sending manufacturer specific\n reply `osdp_MFGREP`."]
 pub type pd_command_callback_t = ::core::option::Option<
@@ -987,6 +1029,33 @@ pub type cp_event_callback_t = ::core::option::Option<
         pd: ::core::ffi::c_int,
         ev: *mut osdp_event,
     ) -> ::core::ffi::c_int,
+>;
+#[doc = "< Successfully completed"]
+pub const osdp_completion_status_OSDP_COMPLETION_OK: osdp_completion_status = 0;
+#[doc = "< Transport/protocol failure"]
+pub const osdp_completion_status_OSDP_COMPLETION_FAILED: osdp_completion_status = 1;
+#[doc = "< Removed by flush API"]
+pub const osdp_completion_status_OSDP_COMPLETION_FLUSHED: osdp_completion_status = 2;
+#[doc = "< Removed during teardown"]
+pub const osdp_completion_status_OSDP_COMPLETION_ABORTED: osdp_completion_status = 3;
+#[doc = " @brief Terminal status of a submitted command/event object."]
+pub type osdp_completion_status = ::core::ffi::c_uchar;
+#[doc = " @brief Callback for CP command completion notifications."]
+pub type cp_command_completion_callback_t = ::core::option::Option<
+    unsafe extern "C" fn(
+        arg: *mut ::core::ffi::c_void,
+        pd: ::core::ffi::c_int,
+        cmd: *const osdp_cmd,
+        status: osdp_completion_status,
+    ),
+>;
+#[doc = " @brief Callback for PD event completion notifications."]
+pub type pd_event_completion_callback_t = ::core::option::Option<
+    unsafe extern "C" fn(
+        arg: *mut ::core::ffi::c_void,
+        ev: *const osdp_event,
+        status: osdp_completion_status,
+    ),
 >;
 unsafe extern "C" {
     #[doc = " @brief This method is used to setup a device in PD mode. Application must\n store the returned context pointer and pass it back to all OSDP functions\n intact.\n\n @param info Pointer to info struct populated by application.\n\n @retval OSDP Context on success\n @retval NULL on errors"]
@@ -1029,7 +1098,7 @@ unsafe extern "C" {
     pub fn osdp_cp_setup(num_pd: ::core::ffi::c_int, info: *const osdp_pd_info_t) -> *mut osdp_t;
 }
 unsafe extern "C" {
-    #[doc = " @brief Adds more PD devices in the CP control list.\n\n @param num_pd Number of PDs connected to this CP. The `osdp_pd_info_t *` is\n treated as an array of length num_pd.\n @param info Pointer to info struct populated by application.\n\n @retval 0 on success\n @retval -1 on failure"]
+    #[doc = " @brief Adds more PD devices in the CP control list.\n\n @param ctx OSDP context\n @param num_pd Number of PDs connected to this CP. The `osdp_pd_info_t *` is\n treated as an array of length num_pd.\n @param info Pointer to info struct populated by application.\n\n @retval 0 on success\n @retval -1 on failure"]
     pub fn osdp_cp_add_pd(
         ctx: *mut osdp_t,
         num_pd: ::core::ffi::c_int,
