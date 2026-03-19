@@ -6,3 +6,6 @@ members = [
     "libosdp",
     "osdpctl"
 ]
+
+[patch.crates-io]
+libosdp-sys = { path = "libosdp-sys" }
