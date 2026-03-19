@@ -529,6 +529,7 @@ impl From<OsdpCommand> for libosdp_sys::osdp_cmd {
     fn from(value: OsdpCommand) -> Self {
         match value {
             OsdpCommand::Led(c) => libosdp_sys::osdp_cmd {
+                _node: unsafe { core::mem::zeroed() },
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_LED,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 {
@@ -536,11 +537,13 @@ impl From<OsdpCommand> for libosdp_sys::osdp_cmd {
                 },
             },
             OsdpCommand::Buzzer(c) => libosdp_sys::osdp_cmd {
+                _node: unsafe { core::mem::zeroed() },
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_BUZZER,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 { buzzer: c.into() },
             },
             OsdpCommand::Text(c) => libosdp_sys::osdp_cmd {
+                _node: unsafe { core::mem::zeroed() },
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_TEXT,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 {
@@ -548,21 +551,25 @@ impl From<OsdpCommand> for libosdp_sys::osdp_cmd {
                 },
             },
             OsdpCommand::Output(c) => libosdp_sys::osdp_cmd {
+                _node: unsafe { core::mem::zeroed() },
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_OUTPUT,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 { output: c.into() },
             },
             OsdpCommand::ComSet(c) => libosdp_sys::osdp_cmd {
+                _node: unsafe { core::mem::zeroed() },
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_COMSET,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 { comset: c.into() },
             },
             OsdpCommand::ComSetDone(c) => libosdp_sys::osdp_cmd {
+                _node: unsafe { core::mem::zeroed() },
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_COMSET_DONE,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 { comset: c.into() },
             },
             OsdpCommand::KeySet(c) => libosdp_sys::osdp_cmd {
+                _node: unsafe { core::mem::zeroed() },
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_KEYSET,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 {
@@ -570,6 +577,7 @@ impl From<OsdpCommand> for libosdp_sys::osdp_cmd {
                 },
             },
             OsdpCommand::Mfg(c) => libosdp_sys::osdp_cmd {
+                _node: unsafe { core::mem::zeroed() },
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_MFG,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 {
@@ -577,11 +585,13 @@ impl From<OsdpCommand> for libosdp_sys::osdp_cmd {
                 },
             },
             OsdpCommand::FileTx(c) => libosdp_sys::osdp_cmd {
+                _node: unsafe { core::mem::zeroed() },
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_FILE_TX,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 { file_tx: c.into() },
             },
             OsdpCommand::Status(c) => libosdp_sys::osdp_cmd {
+                _node: unsafe { core::mem::zeroed() },
                 id: libosdp_sys::osdp_cmd_e_OSDP_CMD_STATUS,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_cmd__bindgen_ty_1 { status: c.into() },

@@ -129,8 +129,10 @@ impl From<Box<dyn Channel>> for libosdp_sys::osdp_channel {
             id,
             data: data as *mut c_void,
             recv: Some(raw_read),
+            recv_pkt: None,
             send: Some(raw_write),
             flush: Some(raw_flush),
+            release_pkt: None,
             close: Some(raw_close),
         }
     }

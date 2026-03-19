@@ -355,6 +355,7 @@ impl From<OsdpEvent> for libosdp_sys::osdp_event {
     fn from(value: OsdpEvent) -> Self {
         match value {
             OsdpEvent::CardRead(e) => libosdp_sys::osdp_event {
+                _node: unsafe { core::mem::zeroed() },
                 type_: libosdp_sys::osdp_event_type_OSDP_EVENT_CARDREAD,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_event__bindgen_ty_1 {
@@ -362,6 +363,7 @@ impl From<OsdpEvent> for libosdp_sys::osdp_event {
                 },
             },
             OsdpEvent::KeyPress(e) => libosdp_sys::osdp_event {
+                _node: unsafe { core::mem::zeroed() },
                 type_: libosdp_sys::osdp_event_type_OSDP_EVENT_KEYPRESS,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_event__bindgen_ty_1 {
@@ -369,6 +371,7 @@ impl From<OsdpEvent> for libosdp_sys::osdp_event {
                 },
             },
             OsdpEvent::MfgReply(e) => libosdp_sys::osdp_event {
+                _node: unsafe { core::mem::zeroed() },
                 type_: libosdp_sys::osdp_event_type_OSDP_EVENT_MFGREP,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_event__bindgen_ty_1 {
@@ -376,6 +379,7 @@ impl From<OsdpEvent> for libosdp_sys::osdp_event {
                 },
             },
             OsdpEvent::Status(e) => libosdp_sys::osdp_event {
+                _node: unsafe { core::mem::zeroed() },
                 type_: libosdp_sys::osdp_event_type_OSDP_EVENT_STATUS,
                 flags: 0,
                 __bindgen_anon_1: libosdp_sys::osdp_event__bindgen_ty_1 { status: e.into() },
