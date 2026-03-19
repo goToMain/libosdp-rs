@@ -199,6 +199,7 @@ fn main() -> Result<()> {
         }
         let bindings = bindgen::Builder::default()
             .use_core()
+            .layout_tests(false)
             .header("vendor/include/osdp.h")
             .clang_args(args)
             .generate()

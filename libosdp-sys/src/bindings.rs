@@ -156,12 +156,6 @@ pub type __pid_t = ::core::ffi::c_int;
 pub struct __fsid_t {
     pub __val: [::core::ffi::c_int; 2usize],
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of __fsid_t"][::core::mem::size_of::<__fsid_t>() - 8usize];
-    ["Alignment of __fsid_t"][::core::mem::align_of::<__fsid_t>() - 4usize];
-    ["Offset of field: __fsid_t::__val"][::core::mem::offset_of!(__fsid_t, __val) - 0usize];
-};
 pub type __clock_t = ::core::ffi::c_long;
 pub type __rlim_t = ::core::ffi::c_ulong;
 pub type __rlim64_t = ::core::ffi::c_ulong;
@@ -291,17 +285,6 @@ pub struct osdp_pd_cap {
     #[doc = " Number of such capability entities in PD"]
     pub num_items: u8,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_pd_cap"][::core::mem::size_of::<osdp_pd_cap>() - 3usize];
-    ["Alignment of osdp_pd_cap"][::core::mem::align_of::<osdp_pd_cap>() - 1usize];
-    ["Offset of field: osdp_pd_cap::function_code"]
-        [::core::mem::offset_of!(osdp_pd_cap, function_code) - 0usize];
-    ["Offset of field: osdp_pd_cap::compliance_level"]
-        [::core::mem::offset_of!(osdp_pd_cap, compliance_level) - 1usize];
-    ["Offset of field: osdp_pd_cap::num_items"]
-        [::core::mem::offset_of!(osdp_pd_cap, num_items) - 2usize];
-};
 #[doc = " @brief PD ID information advertised by the PD."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -317,19 +300,6 @@ pub struct osdp_pd_id {
     #[doc = "< 3-byte version (major, minor, build)"]
     pub firmware_version: u32,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_pd_id"][::core::mem::size_of::<osdp_pd_id>() - 20usize];
-    ["Alignment of osdp_pd_id"][::core::mem::align_of::<osdp_pd_id>() - 4usize];
-    ["Offset of field: osdp_pd_id::version"][::core::mem::offset_of!(osdp_pd_id, version) - 0usize];
-    ["Offset of field: osdp_pd_id::model"][::core::mem::offset_of!(osdp_pd_id, model) - 4usize];
-    ["Offset of field: osdp_pd_id::vendor_code"]
-        [::core::mem::offset_of!(osdp_pd_id, vendor_code) - 8usize];
-    ["Offset of field: osdp_pd_id::serial_number"]
-        [::core::mem::offset_of!(osdp_pd_id, serial_number) - 12usize];
-    ["Offset of field: osdp_pd_id::firmware_version"]
-        [::core::mem::offset_of!(osdp_pd_id, firmware_version) - 16usize];
-};
 #[doc = " @brief pointer to function that copies received bytes into buffer. This\n function should be non-blocking.\n\n @param data for use by underlying layers. osdp_channel::data is passed\n @param buf byte array copy incoming data\n @param maxlen sizeof `buf`. Can copy utmost `maxlen` bytes into `buf`\n\n @retval +ve: number of bytes copied on to `buf`. Must be <= `len`\n @retval -ve on errors"]
 pub type osdp_read_fn_t = ::core::option::Option<
     unsafe extern "C" fn(
@@ -384,23 +354,6 @@ pub struct osdp_channel {
     #[doc = " Pointer to function used to close the channel (optional)"]
     pub close: osdp_close_fn_t,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_channel"][::core::mem::size_of::<osdp_channel>() - 64usize];
-    ["Alignment of osdp_channel"][::core::mem::align_of::<osdp_channel>() - 8usize];
-    ["Offset of field: osdp_channel::data"][::core::mem::offset_of!(osdp_channel, data) - 0usize];
-    ["Offset of field: osdp_channel::id"][::core::mem::offset_of!(osdp_channel, id) - 8usize];
-    ["Offset of field: osdp_channel::recv"][::core::mem::offset_of!(osdp_channel, recv) - 16usize];
-    ["Offset of field: osdp_channel::recv_pkt"]
-        [::core::mem::offset_of!(osdp_channel, recv_pkt) - 24usize];
-    ["Offset of field: osdp_channel::send"][::core::mem::offset_of!(osdp_channel, send) - 32usize];
-    ["Offset of field: osdp_channel::flush"]
-        [::core::mem::offset_of!(osdp_channel, flush) - 40usize];
-    ["Offset of field: osdp_channel::release_pkt"]
-        [::core::mem::offset_of!(osdp_channel, release_pkt) - 48usize];
-    ["Offset of field: osdp_channel::close"]
-        [::core::mem::offset_of!(osdp_channel, close) - 56usize];
-};
 #[doc = " @brief OSDP PD Information. This struct is used to describe a PD to LibOSDP."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -422,26 +375,6 @@ pub struct osdp_pd_info_t {
     #[doc = " Pointer to 16 bytes of Secure Channel Base Key for the PD. If\n non-null, this is used to set-up the secure channel."]
     pub scbk: *const u8,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_pd_info_t"][::core::mem::size_of::<osdp_pd_info_t>() - 120usize];
-    ["Alignment of osdp_pd_info_t"][::core::mem::align_of::<osdp_pd_info_t>() - 8usize];
-    ["Offset of field: osdp_pd_info_t::name"]
-        [::core::mem::offset_of!(osdp_pd_info_t, name) - 0usize];
-    ["Offset of field: osdp_pd_info_t::baud_rate"]
-        [::core::mem::offset_of!(osdp_pd_info_t, baud_rate) - 8usize];
-    ["Offset of field: osdp_pd_info_t::address"]
-        [::core::mem::offset_of!(osdp_pd_info_t, address) - 12usize];
-    ["Offset of field: osdp_pd_info_t::flags"]
-        [::core::mem::offset_of!(osdp_pd_info_t, flags) - 16usize];
-    ["Offset of field: osdp_pd_info_t::id"][::core::mem::offset_of!(osdp_pd_info_t, id) - 20usize];
-    ["Offset of field: osdp_pd_info_t::cap"]
-        [::core::mem::offset_of!(osdp_pd_info_t, cap) - 40usize];
-    ["Offset of field: osdp_pd_info_t::channel"]
-        [::core::mem::offset_of!(osdp_pd_info_t, channel) - 48usize];
-    ["Offset of field: osdp_pd_info_t::scbk"]
-        [::core::mem::offset_of!(osdp_pd_info_t, scbk) - 112usize];
-};
 #[doc = " @brief To keep the OSDP internal data structures from polluting the exposed\n headers, they are typedefed to void before sending them to the upper layers.\n This level of abstraction looked reasonable as _technically_ no one should\n attempt to modify it outside of the LibOSDP and their definition may change\n at any time."]
 pub type osdp_t = ::core::ffi::c_void;
 #[doc = " @brief Status report of the inputs attached the PD"]
@@ -465,17 +398,6 @@ pub struct osdp_status_report {
     #[doc = " Status report"]
     pub report: [u8; 64usize],
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_status_report"][::core::mem::size_of::<osdp_status_report>() - 72usize];
-    ["Alignment of osdp_status_report"][::core::mem::align_of::<osdp_status_report>() - 4usize];
-    ["Offset of field: osdp_status_report::type_"]
-        [::core::mem::offset_of!(osdp_status_report, type_) - 0usize];
-    ["Offset of field: osdp_status_report::nr_entries"]
-        [::core::mem::offset_of!(osdp_status_report, nr_entries) - 4usize];
-    ["Offset of field: osdp_status_report::report"]
-        [::core::mem::offset_of!(osdp_status_report, report) - 8usize];
-};
 #[doc = " @brief Command sent from CP to Control digital output of PD."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -487,17 +409,6 @@ pub struct osdp_cmd_output {
     #[doc = " Time in units of 100 ms"]
     pub timer_count: u16,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_cmd_output"][::core::mem::size_of::<osdp_cmd_output>() - 4usize];
-    ["Alignment of osdp_cmd_output"][::core::mem::align_of::<osdp_cmd_output>() - 2usize];
-    ["Offset of field: osdp_cmd_output::output_no"]
-        [::core::mem::offset_of!(osdp_cmd_output, output_no) - 0usize];
-    ["Offset of field: osdp_cmd_output::control_code"]
-        [::core::mem::offset_of!(osdp_cmd_output, control_code) - 1usize];
-    ["Offset of field: osdp_cmd_output::timer_count"]
-        [::core::mem::offset_of!(osdp_cmd_output, timer_count) - 2usize];
-};
 #[doc = "< No color"]
 pub const osdp_led_color_e_OSDP_LED_COLOR_NONE: osdp_led_color_e = 0;
 #[doc = "< Red"]
@@ -535,23 +446,6 @@ pub struct osdp_cmd_led_params {
     #[doc = " Time in units of 100 ms (only for temporary mode)."]
     pub timer_count: u16,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_cmd_led_params"][::core::mem::size_of::<osdp_cmd_led_params>() - 8usize];
-    ["Alignment of osdp_cmd_led_params"][::core::mem::align_of::<osdp_cmd_led_params>() - 2usize];
-    ["Offset of field: osdp_cmd_led_params::control_code"]
-        [::core::mem::offset_of!(osdp_cmd_led_params, control_code) - 0usize];
-    ["Offset of field: osdp_cmd_led_params::on_count"]
-        [::core::mem::offset_of!(osdp_cmd_led_params, on_count) - 1usize];
-    ["Offset of field: osdp_cmd_led_params::off_count"]
-        [::core::mem::offset_of!(osdp_cmd_led_params, off_count) - 2usize];
-    ["Offset of field: osdp_cmd_led_params::on_color"]
-        [::core::mem::offset_of!(osdp_cmd_led_params, on_color) - 3usize];
-    ["Offset of field: osdp_cmd_led_params::off_color"]
-        [::core::mem::offset_of!(osdp_cmd_led_params, off_color) - 4usize];
-    ["Offset of field: osdp_cmd_led_params::timer_count"]
-        [::core::mem::offset_of!(osdp_cmd_led_params, timer_count) - 6usize];
-};
 #[doc = " @brief Sent from CP to PD to control the behaviour of it's on-board LEDs"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -565,19 +459,6 @@ pub struct osdp_cmd_led {
     #[doc = " Permanent LED status descriptor."]
     pub permanent: osdp_cmd_led_params,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_cmd_led"][::core::mem::size_of::<osdp_cmd_led>() - 18usize];
-    ["Alignment of osdp_cmd_led"][::core::mem::align_of::<osdp_cmd_led>() - 2usize];
-    ["Offset of field: osdp_cmd_led::reader"]
-        [::core::mem::offset_of!(osdp_cmd_led, reader) - 0usize];
-    ["Offset of field: osdp_cmd_led::led_number"]
-        [::core::mem::offset_of!(osdp_cmd_led, led_number) - 1usize];
-    ["Offset of field: osdp_cmd_led::temporary"]
-        [::core::mem::offset_of!(osdp_cmd_led, temporary) - 2usize];
-    ["Offset of field: osdp_cmd_led::permanent"]
-        [::core::mem::offset_of!(osdp_cmd_led, permanent) - 10usize];
-};
 #[doc = " @brief Sent from CP to control the behaviour of a buzzer in the PD."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -593,21 +474,6 @@ pub struct osdp_cmd_buzzer {
     #[doc = " The number of times to repeat the ON/OFF cycle; 0: forever."]
     pub rep_count: u8,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_cmd_buzzer"][::core::mem::size_of::<osdp_cmd_buzzer>() - 5usize];
-    ["Alignment of osdp_cmd_buzzer"][::core::mem::align_of::<osdp_cmd_buzzer>() - 1usize];
-    ["Offset of field: osdp_cmd_buzzer::reader"]
-        [::core::mem::offset_of!(osdp_cmd_buzzer, reader) - 0usize];
-    ["Offset of field: osdp_cmd_buzzer::control_code"]
-        [::core::mem::offset_of!(osdp_cmd_buzzer, control_code) - 1usize];
-    ["Offset of field: osdp_cmd_buzzer::on_count"]
-        [::core::mem::offset_of!(osdp_cmd_buzzer, on_count) - 2usize];
-    ["Offset of field: osdp_cmd_buzzer::off_count"]
-        [::core::mem::offset_of!(osdp_cmd_buzzer, off_count) - 3usize];
-    ["Offset of field: osdp_cmd_buzzer::rep_count"]
-        [::core::mem::offset_of!(osdp_cmd_buzzer, rep_count) - 4usize];
-};
 #[doc = " @brief Command to manipulate any display units that the PD supports."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -627,24 +493,6 @@ pub struct osdp_cmd_text {
     #[doc = " The string to display"]
     pub data: [u8; 32usize],
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_cmd_text"][::core::mem::size_of::<osdp_cmd_text>() - 38usize];
-    ["Alignment of osdp_cmd_text"][::core::mem::align_of::<osdp_cmd_text>() - 1usize];
-    ["Offset of field: osdp_cmd_text::reader"]
-        [::core::mem::offset_of!(osdp_cmd_text, reader) - 0usize];
-    ["Offset of field: osdp_cmd_text::control_code"]
-        [::core::mem::offset_of!(osdp_cmd_text, control_code) - 1usize];
-    ["Offset of field: osdp_cmd_text::temp_time"]
-        [::core::mem::offset_of!(osdp_cmd_text, temp_time) - 2usize];
-    ["Offset of field: osdp_cmd_text::offset_row"]
-        [::core::mem::offset_of!(osdp_cmd_text, offset_row) - 3usize];
-    ["Offset of field: osdp_cmd_text::offset_col"]
-        [::core::mem::offset_of!(osdp_cmd_text, offset_col) - 4usize];
-    ["Offset of field: osdp_cmd_text::length"]
-        [::core::mem::offset_of!(osdp_cmd_text, length) - 5usize];
-    ["Offset of field: osdp_cmd_text::data"][::core::mem::offset_of!(osdp_cmd_text, data) - 6usize];
-};
 #[doc = " @brief Sent in response to a COMSET command. Set communication parameters to\n PD. Must be stored in PD non-volatile memory."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -654,15 +502,6 @@ pub struct osdp_cmd_comset {
     #[doc = " Baud rate.\n\n Valid values: 9600, 19200, 38400, 115200, 230400."]
     pub baud_rate: u32,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_cmd_comset"][::core::mem::size_of::<osdp_cmd_comset>() - 8usize];
-    ["Alignment of osdp_cmd_comset"][::core::mem::align_of::<osdp_cmd_comset>() - 4usize];
-    ["Offset of field: osdp_cmd_comset::address"]
-        [::core::mem::offset_of!(osdp_cmd_comset, address) - 0usize];
-    ["Offset of field: osdp_cmd_comset::baud_rate"]
-        [::core::mem::offset_of!(osdp_cmd_comset, baud_rate) - 4usize];
-};
 #[doc = " @brief This command transfers an encryption key from the CP to a PD."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -674,17 +513,6 @@ pub struct osdp_cmd_keyset {
     #[doc = " Key data"]
     pub data: [u8; 32usize],
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_cmd_keyset"][::core::mem::size_of::<osdp_cmd_keyset>() - 34usize];
-    ["Alignment of osdp_cmd_keyset"][::core::mem::align_of::<osdp_cmd_keyset>() - 1usize];
-    ["Offset of field: osdp_cmd_keyset::type_"]
-        [::core::mem::offset_of!(osdp_cmd_keyset, type_) - 0usize];
-    ["Offset of field: osdp_cmd_keyset::length"]
-        [::core::mem::offset_of!(osdp_cmd_keyset, length) - 1usize];
-    ["Offset of field: osdp_cmd_keyset::data"]
-        [::core::mem::offset_of!(osdp_cmd_keyset, data) - 2usize];
-};
 #[doc = " @brief Manufacturer Specific Commands"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -696,16 +524,6 @@ pub struct osdp_cmd_mfg {
     #[doc = " Length of the data (internal use)"]
     pub length: u8,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_cmd_mfg"][::core::mem::size_of::<osdp_cmd_mfg>() - 72usize];
-    ["Alignment of osdp_cmd_mfg"][::core::mem::align_of::<osdp_cmd_mfg>() - 4usize];
-    ["Offset of field: osdp_cmd_mfg::vendor_code"]
-        [::core::mem::offset_of!(osdp_cmd_mfg, vendor_code) - 0usize];
-    ["Offset of field: osdp_cmd_mfg::data"][::core::mem::offset_of!(osdp_cmd_mfg, data) - 4usize];
-    ["Offset of field: osdp_cmd_mfg::length"]
-        [::core::mem::offset_of!(osdp_cmd_mfg, length) - 68usize];
-};
 #[doc = " @brief File transfer start command"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -715,15 +533,6 @@ pub struct osdp_cmd_file_tx {
     #[doc = " Reserved and set to zero by OSDP spec.\n\n @note: The upper bits are used by libosdp internally (IOW, not sent\n over the OSDP bus). Currently the following flags are defined:\n\n - @ref OSDP_CMD_FILE_TX_FLAG_CANCEL"]
     pub flags: u32,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_cmd_file_tx"][::core::mem::size_of::<osdp_cmd_file_tx>() - 8usize];
-    ["Alignment of osdp_cmd_file_tx"][::core::mem::align_of::<osdp_cmd_file_tx>() - 4usize];
-    ["Offset of field: osdp_cmd_file_tx::id"]
-        [::core::mem::offset_of!(osdp_cmd_file_tx, id) - 0usize];
-    ["Offset of field: osdp_cmd_file_tx::flags"]
-        [::core::mem::offset_of!(osdp_cmd_file_tx, flags) - 4usize];
-};
 #[doc = "< Output control command"]
 pub const osdp_cmd_e_OSDP_CMD_OUTPUT: osdp_cmd_e = 1;
 #[doc = "< Reader LED control command"]
@@ -756,15 +565,6 @@ pub struct osdp_queue_node_s {
     pub next: *mut osdp_queue_node_t,
     pub prev: *mut osdp_queue_node_t,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_queue_node_s"][::core::mem::size_of::<osdp_queue_node_s>() - 16usize];
-    ["Alignment of osdp_queue_node_s"][::core::mem::align_of::<osdp_queue_node_s>() - 8usize];
-    ["Offset of field: osdp_queue_node_s::next"]
-        [::core::mem::offset_of!(osdp_queue_node_s, next) - 0usize];
-    ["Offset of field: osdp_queue_node_s::prev"]
-        [::core::mem::offset_of!(osdp_queue_node_s, prev) - 8usize];
-};
 #[doc = " @brief OSDP Command Structure. This is a wrapper for all individual OSDP\n commands."]
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -800,38 +600,6 @@ pub union osdp_cmd__bindgen_ty_1 {
     #[doc = "< Status report command structure"]
     pub status: osdp_status_report,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_cmd__bindgen_ty_1"][::core::mem::size_of::<osdp_cmd__bindgen_ty_1>() - 72usize];
-    ["Alignment of osdp_cmd__bindgen_ty_1"]
-        [::core::mem::align_of::<osdp_cmd__bindgen_ty_1>() - 4usize];
-    ["Offset of field: osdp_cmd__bindgen_ty_1::led"]
-        [::core::mem::offset_of!(osdp_cmd__bindgen_ty_1, led) - 0usize];
-    ["Offset of field: osdp_cmd__bindgen_ty_1::buzzer"]
-        [::core::mem::offset_of!(osdp_cmd__bindgen_ty_1, buzzer) - 0usize];
-    ["Offset of field: osdp_cmd__bindgen_ty_1::text"]
-        [::core::mem::offset_of!(osdp_cmd__bindgen_ty_1, text) - 0usize];
-    ["Offset of field: osdp_cmd__bindgen_ty_1::output"]
-        [::core::mem::offset_of!(osdp_cmd__bindgen_ty_1, output) - 0usize];
-    ["Offset of field: osdp_cmd__bindgen_ty_1::comset"]
-        [::core::mem::offset_of!(osdp_cmd__bindgen_ty_1, comset) - 0usize];
-    ["Offset of field: osdp_cmd__bindgen_ty_1::keyset"]
-        [::core::mem::offset_of!(osdp_cmd__bindgen_ty_1, keyset) - 0usize];
-    ["Offset of field: osdp_cmd__bindgen_ty_1::mfg"]
-        [::core::mem::offset_of!(osdp_cmd__bindgen_ty_1, mfg) - 0usize];
-    ["Offset of field: osdp_cmd__bindgen_ty_1::file_tx"]
-        [::core::mem::offset_of!(osdp_cmd__bindgen_ty_1, file_tx) - 0usize];
-    ["Offset of field: osdp_cmd__bindgen_ty_1::status"]
-        [::core::mem::offset_of!(osdp_cmd__bindgen_ty_1, status) - 0usize];
-};
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_cmd"][::core::mem::size_of::<osdp_cmd>() - 96usize];
-    ["Alignment of osdp_cmd"][::core::mem::align_of::<osdp_cmd>() - 8usize];
-    ["Offset of field: osdp_cmd::_node"][::core::mem::offset_of!(osdp_cmd, _node) - 0usize];
-    ["Offset of field: osdp_cmd::id"][::core::mem::offset_of!(osdp_cmd, id) - 16usize];
-    ["Offset of field: osdp_cmd::flags"][::core::mem::offset_of!(osdp_cmd, flags) - 20usize];
-};
 #[doc = "< Unspecified card format"]
 pub const osdp_event_cardread_format_e_OSDP_CARD_FMT_RAW_UNSPECIFIED: osdp_event_cardread_format_e =
     0;
@@ -858,21 +626,6 @@ pub struct osdp_event_cardread {
     #[doc = " Card data of @a length bytes or bits bits depending on @a format"]
     pub data: [u8; 64usize],
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_event_cardread"][::core::mem::size_of::<osdp_event_cardread>() - 80usize];
-    ["Alignment of osdp_event_cardread"][::core::mem::align_of::<osdp_event_cardread>() - 4usize];
-    ["Offset of field: osdp_event_cardread::reader_no"]
-        [::core::mem::offset_of!(osdp_event_cardread, reader_no) - 0usize];
-    ["Offset of field: osdp_event_cardread::format"]
-        [::core::mem::offset_of!(osdp_event_cardread, format) - 4usize];
-    ["Offset of field: osdp_event_cardread::direction"]
-        [::core::mem::offset_of!(osdp_event_cardread, direction) - 8usize];
-    ["Offset of field: osdp_event_cardread::length"]
-        [::core::mem::offset_of!(osdp_event_cardread, length) - 12usize];
-    ["Offset of field: osdp_event_cardread::data"]
-        [::core::mem::offset_of!(osdp_event_cardread, data) - 16usize];
-};
 #[doc = " @brief OSDP Event Keypad"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -884,17 +637,6 @@ pub struct osdp_event_keypress {
     #[doc = " Keypress data of @a length bytes"]
     pub data: [u8; 64usize],
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_event_keypress"][::core::mem::size_of::<osdp_event_keypress>() - 72usize];
-    ["Alignment of osdp_event_keypress"][::core::mem::align_of::<osdp_event_keypress>() - 4usize];
-    ["Offset of field: osdp_event_keypress::reader_no"]
-        [::core::mem::offset_of!(osdp_event_keypress, reader_no) - 0usize];
-    ["Offset of field: osdp_event_keypress::length"]
-        [::core::mem::offset_of!(osdp_event_keypress, length) - 4usize];
-    ["Offset of field: osdp_event_keypress::data"]
-        [::core::mem::offset_of!(osdp_event_keypress, data) - 8usize];
-};
 #[doc = " @brief OSDP Event Manufacturer Specific Command\n\n @note OSDP spec v2.2 makes this structure fixed at 4 bytes (3-byte vendor\n code and 1-byte data). LibOSDP allows for some additional data to be passed\n in this command using the @a data and @a length fields while using the\n 1-byte data (as specified in the specification) as @a command. To be fully\n compliant with the specification, you can set @a length to 0."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -906,17 +648,6 @@ pub struct osdp_event_mfgrep {
     #[doc = " Manufacturer data of `length` bytes (optional)"]
     pub data: [u8; 128usize],
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_event_mfgrep"][::core::mem::size_of::<osdp_event_mfgrep>() - 136usize];
-    ["Alignment of osdp_event_mfgrep"][::core::mem::align_of::<osdp_event_mfgrep>() - 4usize];
-    ["Offset of field: osdp_event_mfgrep::vendor_code"]
-        [::core::mem::offset_of!(osdp_event_mfgrep, vendor_code) - 0usize];
-    ["Offset of field: osdp_event_mfgrep::length"]
-        [::core::mem::offset_of!(osdp_event_mfgrep, length) - 4usize];
-    ["Offset of field: osdp_event_mfgrep::data"]
-        [::core::mem::offset_of!(osdp_event_mfgrep, data) - 5usize];
-};
 #[doc = " Application command outcome report.\n\n arg0: The command ID\n arg1: outcome -- 0: success; -1: failure;"]
 pub const osdp_event_notification_type_OSDP_EVENT_NOTIFICATION_COMMAND:
     osdp_event_notification_type = 0;
@@ -939,19 +670,6 @@ pub struct osdp_event_notification {
     #[doc = "< Additional data member"]
     pub arg1: ::core::ffi::c_int,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_event_notification"]
-        [::core::mem::size_of::<osdp_event_notification>() - 12usize];
-    ["Alignment of osdp_event_notification"]
-        [::core::mem::align_of::<osdp_event_notification>() - 4usize];
-    ["Offset of field: osdp_event_notification::type_"]
-        [::core::mem::offset_of!(osdp_event_notification, type_) - 0usize];
-    ["Offset of field: osdp_event_notification::arg0"]
-        [::core::mem::offset_of!(osdp_event_notification, arg0) - 4usize];
-    ["Offset of field: osdp_event_notification::arg1"]
-        [::core::mem::offset_of!(osdp_event_notification, arg1) - 8usize];
-};
 #[doc = "< Card read event"]
 pub const osdp_event_type_OSDP_EVENT_CARDREAD: osdp_event_type = 1;
 #[doc = "< Keypad press event"]
@@ -993,31 +711,6 @@ pub union osdp_event__bindgen_ty_1 {
     #[doc = "< Notification event structure"]
     pub notif: osdp_event_notification,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_event__bindgen_ty_1"]
-        [::core::mem::size_of::<osdp_event__bindgen_ty_1>() - 136usize];
-    ["Alignment of osdp_event__bindgen_ty_1"]
-        [::core::mem::align_of::<osdp_event__bindgen_ty_1>() - 4usize];
-    ["Offset of field: osdp_event__bindgen_ty_1::keypress"]
-        [::core::mem::offset_of!(osdp_event__bindgen_ty_1, keypress) - 0usize];
-    ["Offset of field: osdp_event__bindgen_ty_1::cardread"]
-        [::core::mem::offset_of!(osdp_event__bindgen_ty_1, cardread) - 0usize];
-    ["Offset of field: osdp_event__bindgen_ty_1::mfgrep"]
-        [::core::mem::offset_of!(osdp_event__bindgen_ty_1, mfgrep) - 0usize];
-    ["Offset of field: osdp_event__bindgen_ty_1::status"]
-        [::core::mem::offset_of!(osdp_event__bindgen_ty_1, status) - 0usize];
-    ["Offset of field: osdp_event__bindgen_ty_1::notif"]
-        [::core::mem::offset_of!(osdp_event__bindgen_ty_1, notif) - 0usize];
-};
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_event"][::core::mem::size_of::<osdp_event>() - 160usize];
-    ["Alignment of osdp_event"][::core::mem::align_of::<osdp_event>() - 8usize];
-    ["Offset of field: osdp_event::_node"][::core::mem::offset_of!(osdp_event, _node) - 0usize];
-    ["Offset of field: osdp_event::type_"][::core::mem::offset_of!(osdp_event, type_) - 16usize];
-    ["Offset of field: osdp_event::flags"][::core::mem::offset_of!(osdp_event, flags) - 20usize];
-};
 #[doc = " @brief Callback for PD command notifications. After it has been registered\n with `osdp_pd_set_command_callback`, this method is invoked when the PD\n receives a command from the CP.\n\n @param arg pointer that will was passed to the arg param of\n `osdp_pd_set_command_callback`.\n @param cmd pointer to the received command.\n\n @retval 0 if LibOSDP must send a `osdp_ACK` response\n @retval -ve if LibOSDP must send a `osdp_NAK` response\n @retval +ve and modify the passed `struct osdp_cmd *cmd` if LibOSDP must\n send a specific response. This is useful for sending manufacturer specific\n reply `osdp_MFGREP`."]
 pub type pd_command_callback_t = ::core::option::Option<
     unsafe extern "C" fn(arg: *mut ::core::ffi::c_void, cmd: *mut osdp_cmd) -> ::core::ffi::c_int,
@@ -1284,19 +977,6 @@ pub struct osdp_file_ops {
     #[doc = "< close handler function"]
     pub close: osdp_file_close_fn_t,
 }
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of osdp_file_ops"][::core::mem::size_of::<osdp_file_ops>() - 40usize];
-    ["Alignment of osdp_file_ops"][::core::mem::align_of::<osdp_file_ops>() - 8usize];
-    ["Offset of field: osdp_file_ops::arg"][::core::mem::offset_of!(osdp_file_ops, arg) - 0usize];
-    ["Offset of field: osdp_file_ops::open"][::core::mem::offset_of!(osdp_file_ops, open) - 8usize];
-    ["Offset of field: osdp_file_ops::read"]
-        [::core::mem::offset_of!(osdp_file_ops, read) - 16usize];
-    ["Offset of field: osdp_file_ops::write"]
-        [::core::mem::offset_of!(osdp_file_ops, write) - 24usize];
-    ["Offset of field: osdp_file_ops::close"]
-        [::core::mem::offset_of!(osdp_file_ops, close) - 32usize];
-};
 unsafe extern "C" {
     #[doc = " @brief Register a global file operations struct with OSDP. Both CP and PD\n modes should have done so already before CP can sending a OSDP_CMD_FILE_TX.\n\n @param ctx OSDP context\n @param pd PD number in case of CP. This param is ignored in PD mode\n @param ops Populated file operations struct\n\n @retval 0 on success. -1 on errors."]
     pub fn osdp_file_register_ops(
